@@ -10,8 +10,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "axios": "^0.19.2",
-    "bcrypt": "^4.0.1",
+    "axios": "^1.9.0",
+    "bcrypt": "^5.1.1",
     "client-sessions": "^0.8.0",
     "cookie-parser": "^1.4.5",
     "cors": "^2.8.5",
@@ -22,7 +22,7 @@
     "morgan": "^1.10.0",
     "mssql": "^6.2.0",
     "mysql2": "^3.3.4",
-    "nodemon": "^2.0.4",
+    "nodemon": "^3.1.10",
     "pg": "^8.2.1"
   },
   "devDependencies": {
