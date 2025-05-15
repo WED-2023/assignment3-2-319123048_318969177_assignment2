@@ -71,7 +71,7 @@ router.post("/login", async (req, res, next) => {
       username: user.username
     });
   } catch (error) {
-    console.error("Register error:", error);
+    console.error("login error:", error);
     next(error);
   }
 });
