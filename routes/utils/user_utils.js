@@ -2,6 +2,9 @@ const DButils = require("./DButils");
 const axios = require('axios');
 require("dotenv").config();
 
+
+
+
 async function markAsFavorite(user_id, recipe_id){
     await DButils.execQuery(`insert into FavoriteRecipes values ('${user_id}',${recipe_id})`);
 }
