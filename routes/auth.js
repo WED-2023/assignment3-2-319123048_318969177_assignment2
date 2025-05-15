@@ -4,7 +4,7 @@ const MySql = require("../routes/utils/MySql");
 const DButils = require("../routes/utils/DButils");
 const bcrypt = require("bcrypt");
 
-router.post("/Register", async (req, res, next) => {
+router.post("/register", async (req, res, next) => {
   try {
     // parameters exists
     // valid parameters
@@ -20,7 +20,8 @@ router.post("/Register", async (req, res, next) => {
     }
     let users = [];
     users = await DButils.execQuery("SELECT username from users");
-
+    //needs to change to status 400 or add 409 to the API in the future
+    // check that username is not taken
     if (users.find((x) => x.username === user_details.username))
       throw { status: 409, message: "Username taken" };
 
@@ -36,11 +37,12 @@ router.post("/Register", async (req, res, next) => {
     );
     res.status(201).send({ message: "user created", success: true });
   } catch (error) {
+    console.error("Register error:", error);
     next(error);
   }
 });
 
-router.post("/Login", async (req, res, next) => {
+router.post("/login", async (req, res, next) => {
   try {
     // check that username exists
     const users = await DButils.execQuery("SELECT username FROM users");
@@ -63,13 +65,18 @@ router.post("/Login", async (req, res, next) => {
     console.log("session user_id login: " + req.session.user_id);
 
     // return cookie
-    res.status(200).send({ message: "login succeeded " , success: true });
+    res.status(200).send({
+      message: "login succeeded",
+      success: true,
+      username: user.username
+    });
   } catch (error) {
+    console.error("Register error:", error);
     next(error);
   }
 });
 
-router.post("/Logout", function (req, res) {
+router.post("/logout", function (req, res) {
   console.log("session user_id Logout: " + req.session.user_id);
   req.session.reset(); // reset the session info --> send cookie when  req.session == undefined!!
   res.send({ success: true, message: "logout succeeded" });
