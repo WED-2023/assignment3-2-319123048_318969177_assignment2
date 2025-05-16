@@ -58,7 +58,7 @@ CREATE TABLE IF NOT EXISTS viewed_recipes (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
     recipe_id VARCHAR(255) NOT NULL,
-    view_timestamp DATETIME NOT NULL,
+    view_timestamp DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
 
@@ -66,6 +66,7 @@ CREATE TABLE IF NOT EXISTS viewed_recipes (
 CREATE TABLE IF NOT EXISTS user_searches (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
+    recipe_id VARCHAR(255) NOT NULL,
     search_query VARCHAR(255) NOT NULL,
     search_timestamp DATETIME NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users(user_id)

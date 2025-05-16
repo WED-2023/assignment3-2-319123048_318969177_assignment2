@@ -63,6 +63,6 @@ module.exports = {
     getRecipeOverViewSpoonacular,
     // for multiple recipes from DB and Spoonacular
     getRecipeDetails,
-    // get single recipe information from Spoonacular
+    // get single recipe data from Spoonacular
     getRecipeInformation
 }
