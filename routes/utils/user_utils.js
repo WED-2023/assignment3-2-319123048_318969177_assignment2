@@ -68,5 +68,6 @@ module.exports = {
     getRecipes,
     MarkAsVeiwed,
     getFamilyRecipes,
-    getLastSearch
+    getLastSearch,
+    getViewedRecipes
 };

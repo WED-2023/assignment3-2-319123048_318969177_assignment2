@@ -68,6 +68,7 @@ router.get('/my_recipes', async (req,res,next) => {
     let recipes_id_array = [];
     recipes_id.map((element) => recipes_id_array.push(element.recipe_id)); //extracting the recipe ids into string array 
     const results = await recipe_help_utils.getLocalRecipes(recipes_id_array); 
+    res.status(200).send(results);
   }catch(error){
     console.error("error: ", error);
     next(error);
