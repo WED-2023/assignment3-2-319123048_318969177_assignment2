@@ -1,5 +1,5 @@
 const DButils = require("./DButils");
-const recipe_utils = require("./recipe_utils");
+const recipe_post_utils = require("./recipe_post_utils");
 require("dotenv").config();
 
 // synchonic function to add the recipe to the favorite list of the logged-in user
@@ -12,10 +12,6 @@ async function getFavoriteRecipes(user_id){
     return recipes_id;
 }
 
-// synchonic function to get the recipes preview of the logged-in user from recipe_util.js
-async function getRecipesPreview(recipes_id_array){
-    return await recipe_utils.getRecipeDetails(recipes_id_array);
-}
 
 async function getRecipes(user_id){
 

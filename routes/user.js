@@ -2,7 +2,8 @@ var express = require("express");
 var router = express.Router();
 const DButils = require("./utils/DButils");
 const user_utils = require("./utils/user_utils");
-const recipe_utils = require("./utils/recipes_utils");
+const recipe_post_utils = require("./utils/recipes_post_utils");
+const recipe_get_utils = require("./utils/recipes_get_utils");
 
 /**
  * Authenticate all incoming requests by middleware
@@ -44,9 +45,9 @@ router.get('/my_favorites', async (req,res,next) => {
     const user_id = req.session.user_id;
     const recipes_id = await user_utils.getFavoriteRecipes(user_id); //returns the recipes id of the favorite recipes
     let recipes_id_array = [];
-    recipes_id.map((element) => recipes_id_array.push(element.recipe_id)); //extracting the recipe ids into array
-    //for each recipe id, we get the recipe details from the DB or the API of spoonacular
-    const results = await recipe_utils.getRecipesPreview(recipes_id_array); 
+    recipes_id.map((element) => recipes_id_array.push(element.recipe_id)); //extracting the recipe ids into string array 
+    //for each recipe id, we get the recipe details from the DB or spoonacular
+    const results = await recipe_get_utils.getRecipeDetails(recipes_id_array); 
     res.status(200).send(results); // returning the recipes details
   } catch(error){
     console.error("error: ", error);
@@ -60,17 +61,7 @@ router.get('/my_favorites', async (req,res,next) => {
  * This path returns the recipes of the logged-in user
  */
 router.get('/my_recipes', async (req,res,next) => {
-  try{
-    const user_id = req.session.user_id;
-    const recipes_id = await user_utils.getRecipes(user_id);
-    let recipes_id_array = [];
-    recipes_id.map((element) => recipes_id_array.push(element.recipe_id)); //extracting the recipe ids into array
-    const results = await recipe_utils.getRecipesPreview(recipes_id_array);
-    res.status(200).send(results);
-  } catch(error){
-    console.error("error: ", error);
-    next(error); 
-  }
+
 });
 
 
