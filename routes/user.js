@@ -42,11 +42,12 @@ router.post('/my_favorites', async (req,res,next) => {
 router.get('/my_favorites', async (req,res,next) => {
   try{
     const user_id = req.session.user_id;
-    const recipes_id = await user_utils.getFavoriteRecipes(user_id);
+    const recipes_id = await user_utils.getFavoriteRecipes(user_id); //returns the recipes id of the favorite recipes
     let recipes_id_array = [];
     recipes_id.map((element) => recipes_id_array.push(element.recipe_id)); //extracting the recipe ids into array
-    const results = await recipe_utils.getRecipesPreview(recipes_id_array);
-    res.status(200).send(results);
+    //for each recipe id, we get the recipe details from the DB or the API of spoonacular
+    const results = await recipe_utils.getRecipesPreview(recipes_id_array); 
+    res.status(200).send(results); // returning the recipes details
   } catch(error){
     console.error("error: ", error);
     next(error); 
