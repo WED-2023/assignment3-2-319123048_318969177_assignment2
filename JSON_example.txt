@@ -9,6 +9,11 @@
   "profilePic": "https://example.com/yaki.jpg"
 }
 
+# example for login request:
+{
+    "username": "noa123",
+    "password": "SuperSecure123!"
+}
 
 # example for new recipe JSON:
 {
