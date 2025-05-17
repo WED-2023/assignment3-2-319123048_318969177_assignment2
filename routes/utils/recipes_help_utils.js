@@ -1,8 +1,7 @@
 const axios = require("axios");
 const api_domain = "https://api.spoonacular.com/recipes";
 const DButils = require("./DButils");
-const recipes_post_utils = require("./utils/recipes_post_utils");
-const recipes_get_utils = require("./utils/recipes_get_utils");
+const recipes_get_utils = require("./recipes_get_utils");
 /**
  * This file is for all the functions that help the logic of the recipes, and are 'private' to the recipes
  */

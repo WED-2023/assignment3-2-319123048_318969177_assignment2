@@ -1,7 +1,7 @@
 const axios = require("axios");
 const api_domain = "https://api.spoonacular.com/recipes";
 const DButils = require("./DButils");
-const recipes_help_utils = require("./utils/recipes_help_utils");
+const recipes_help_utils = require("./recipes_help_utils");
 /**
  * This File is for all the get functions that are related to the recipes
  * Get from the DB and from the Spoonacular API
@@ -12,7 +12,7 @@ async function getRecipeInformation(recipe_id) {
     return await axios.get(`${api_domain}/${recipe_id}/information`, {
         params: {
             includeNutrition: false,
-            apiKey: process.env.spooncular_apiKey_noa
+            apiKey: process.env.spooncular_apiKey
         }
     });
 }

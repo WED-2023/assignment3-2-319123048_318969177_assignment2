@@ -1,7 +1,4 @@
 const DButils = require("./DButils");
-const recipe_post_utils = require("./recipe_post_utils");
-const recipes_help_utils = require("./utils/recipes_help_utils");
-const recipes_get_utils = require("./utils/recipes_get_utils");
 require("dotenv").config();
 
 // synchronic function to add the recipe to the favorite list of the logged-in user
