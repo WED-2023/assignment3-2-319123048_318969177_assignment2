@@ -1,9 +1,8 @@
 -- INSERT INTO users (username, firstname, lastname, country, password, email, profilePic)
 -- VALUES
 -- ('noa123', 'Noa', 'Patchornik', 'Israel', 'SuperSecure123!', 'noa@example.com', 'https://example.com/noa.jpg'),
--- ('lior456', 'Lior', 'Levi', 'Israel', 'Super1234!', 'lior@example.com', 'https://example.com/lior.jpg'),
--- ('dana789', 'Dana', 'Chen', 'Israel', 'Cool20!', 'dana@example.com', 'https://example.com/dana.jpg'),
--- ('yakin', 'Yaki', 'Naftali', 'Israel', 'What?5', 'yakin@example.com', 'https://example.com/yaki.jpg');
+-- ('yakin', 'Yaki', 'Naftali', 'Israel', 'What?2', 'yakin@example.com', 'https://example.com/yaki.jpg');
+-- ('nat30' , 'Neta', 'Patchornik', 'Israel', 'Beach30!', 'neta30@example.com', 'https://example.com/neta.jpg')
 
 -- To users table use PostMan with url /auth/register
 -- Spoonacular API example of recipes for pasta
@@ -42,8 +41,8 @@ INSERT INTO recipes (
 VALUES
 ('1ID', 1, 'Noa’s Vegan Pasta', 30, 'https://example.com/pasta.jpg', 50, TRUE, TRUE, TRUE, '["Boil pasta", "Add sauce"]', 2, 'Noa', FALSE, NULL, NULL),
 ('2ID', 1, 'Grandma’s Cookies', 45, 'https://example.com/cookies.jpg', 80, FALSE, TRUE, FALSE, '["Mix dough", "Bake"]', 12, 'Noa', TRUE, 'Grandma', 'Holiday'),
-('3ID', 2, 'Lior’s Shakshuka', 25, 'https://example.com/shakshuka.jpg', 65, FALSE, TRUE, TRUE, '["Cook tomatoes", "Add eggs"]', 4, 'Lior', FALSE, NULL, NULL),
-('4ID', 3, 'Dana’s Brownies', 40, 'https://example.com/brownies.jpg', 90, FALSE, TRUE, FALSE, '["Prepare batter", "Bake"]', 8, 'Dana', TRUE, 'Mom', 'Birthday');
+('3ID', 2, 'Neta’s Shakshuka', 25, 'https://example.com/shakshuka.jpg', 65, FALSE, TRUE, TRUE, '["Cook tomatoes", "Add eggs"]', 4, 'Neta', FALSE, NULL, NULL),
+('4ID', 3, 'Yaki’s Brownies', 40, 'https://example.com/brownies.jpg', 90, FALSE, TRUE, FALSE, '["Prepare batter", "Bake"]', 8, 'Yaki', TRUE, 'Mom', 'Birthday');
 
 
 INSERT INTO ingredients (recipe_id, name, amount, unit)

@@ -8,8 +8,8 @@ async function markAsFavorite(user_id, recipe_id){
 
 // synchronic function to get the favorite recipes of the logged-in user
 async function getFavoriteRecipes(user_id){
-    const recipes_id = await DButils.execQuery(`select recipe_id from favoriterecipes where user_id='${user_id}'`);
-    return recipes_id;
+  const result = await DButils.execQuery(`SELECT recipe_id FROM FavoriteRecipes WHERE user_id='${user_id}'`);
+  return result.map(r => r.recipe_id); 
 }
 
 // synchronic function to get the recipes of the logged-in user from DB
@@ -20,17 +20,16 @@ async function getRecipes(user_id){
 
 // synchronic function to mark the recipe as viewed by the logged-in user
 async function MarkAsVeiwed(user_id,recipe_id) {
-    await DButils.execQuery(`insert into viewed_recipes values ('${user_id}',${recipe_id})`);
+    await DButils.execQuery(`
+      INSERT INTO viewed_recipes (user_id, recipe_id)
+      VALUES ('${user_id}', '${recipe_id}')
+    `);
 }
 
 // synchronic function to get the recipe IDs of the viewed recipes of the logged-in user
 async function getAllViewedRecipes(user_id) {
-  const recipes_id = await DButils.execQuery(`
-    SELECT recipe_id
-    FROM viewed_recipes
-    WHERE user_id = '${user_id}'
-  `);
-  return recipes_id;
+  const result = await DButils.execQuery(`SELECT recipe_id FROM viewed_recipes WHERE user_id='${user_id}'`);
+  return result.map(r => r.recipe_id);
 }
 // synchonic function to get the 3 last viewed recipes of the logged-in user from DB
 async function getViewedRecipes(user_id) {

@@ -1,7 +1,7 @@
 const axios = require("axios");
 const api_domain = "https://api.spoonacular.com/recipes";
 const DButils = require("./DButils");
-
+const user_utils = require("./user_utils");
 
 
 
@@ -38,36 +38,34 @@ async function getRecipeOverViewSpoonacular(recipe_id) {
     }
 }
 
-// synchonic function that get array of recipes IDs, and returns the recipes OverView in JSON format
-async function getRecipeDetails(recipeIds_array,user_id) {
+// synchronic function that gets array of recipe IDs and returns recipes overview in JSON format
+async function getRecipeDetails(recipeIds_array, user_id) {
   const localRecipes = [];
   const spoonacularIds = [];
 
-  // Split the IDs to local and Spoonacular IDs arrays, local IDs are strings that contain "ID"
   for (const id of recipeIds_array) {
-    if (id.includes("ID")) {
+    if (typeof id === 'string' && id.includes("ID")) {
       localRecipes.push(id);
     } else {
       spoonacularIds.push(id);
     }
   }
-  console.log("HELP UTILS:", recipes_help_utils);
-  const localResults = await getLocalRecipes(localRecipes,user_id);
-  const spoonacularResults = await getSpoonacularRecipes(spoonacularIds,user_id);
+
+  const localResults = await getLocalRecipes(localRecipes, user_id);
+  const spoonacularResults = await getSpoonacularRecipes(spoonacularIds, user_id);
 
   return [...localResults, ...spoonacularResults];
-
 }
 
-// function to get the recipes overview from the Spoonacular API, using the existing functions
-async function getSpoonacularRecipes(spoonacularIds,user_id) {
+// function to get the recipes overview from the Spoonacular API
+async function getSpoonacularRecipes(spoonacularIds, user_id) {
   if (spoonacularIds.length === 0) return [];
 
-    try {
+  try {
     const [favorites, viewed] = user_id
       ? await Promise.all([
-          user_utils.getFavoriteRecipeIds(user_id),
-          user_utils.getViewedRecipeIds(user_id)
+          user_utils.getFavoriteRecipes(user_id) || [],
+          user_utils.getAllViewedRecipes(user_id) || []
         ])
       : [[], []];
 
@@ -94,7 +92,6 @@ async function getLocalRecipes(localRecipes, user_id) {
   if (localRecipes.length === 0) return [];
 
   const formattedIds = localRecipes.map(id => `'${id}'`).join(",");
-
   const query = `
     SELECT recipe_id, title, ready_in_minutes, image, popularity, vegan, vegetarian, gluten_free
     FROM recipes
@@ -104,8 +101,8 @@ async function getLocalRecipes(localRecipes, user_id) {
   try {
     const [localResults, favorites, viewed] = await Promise.all([
       DButils.execQuery(query),
-      user_id ? user_utils.getFavoriteRecipes(user_id) : [],
-      user_id ? user_utils.getAllViewedRecipes(user_id) : []
+      user_id ? user_utils.getFavoriteRecipes(user_id) || [] : [],
+      user_id ? user_utils.getAllViewedRecipes(user_id) || [] : []
     ]);
 
     return localResults.map(recipe => ({
@@ -114,9 +111,9 @@ async function getLocalRecipes(localRecipes, user_id) {
       readyInMinutes: recipe.ready_in_minutes,
       image: recipe.image,
       popularity: recipe.popularity,
-      vegan: recipe.vegan,
-      vegetarian: recipe.vegetarian,
-      glutenFree: recipe.gluten_free,
+      vegan: Boolean(recipe.vegan),
+      vegetarian: Boolean(recipe.vegetarian),
+      glutenFree: Boolean(recipe.gluten_free),
       isFavorite: favorites.includes(recipe.recipe_id),
       isWatched: viewed.includes(recipe.recipe_id)
     }));
@@ -125,6 +122,7 @@ async function getLocalRecipes(localRecipes, user_id) {
     throw err;
   }
 }
+
 
 module.exports = {
     // for multiple recipes from DB 

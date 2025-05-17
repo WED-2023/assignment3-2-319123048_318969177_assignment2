@@ -74,44 +74,13 @@ router.get('/my_recipes', async (req,res,next) => {
   }});
 
 
-  /**
-   * This path create recipe 
-   */
-  router.post('/my_recipes', async (req,res,next) => {
-    try{
-      const user_id = req.session.user_id;
-      let recipe_details = {
-      title: req.body.title,
-      image: req.body.image,
-      readyInMinutes: req.body.readyInMinutes,
-      popularity: req.body.popularity, 
-      isvegan: req.body.isvegan,
-      isvegetarian: req.body.isvegetarian,
-      isglutenFree: req.body.isglutenFree,
-      ingredients: req.body.ingredients,
-      instructions: req.body.instructions,
-      servings: req.body.servings,
-      createrBy: user_id,
-      isFamily: req.body.isFamily,
-      familyMember: req.body.familyMember,
-      occusion: req.body.occusion
-      }
-      const recipe_id = await recipes_post_utils.createRecipe(user_id,recipe_details); // create the recipe in the DB
-      res.status(200).send("The Recipe successfully saved");
-    }catch(error){
-      console.error("error: ", error);
-      next(error);
-    }
-  });
-
-
 /**
  * This path mark a recipe of the logged-in user as viewed
  */
-router.post('/{recipeid}/viewed', async (req,res,next) => {
+router.post('/:recipeid/viewed', async (req,res,next) => {
   try{
     const user_id = req.session.user_id;
-    const recipe_id = String(req.path.recipeid);
+    const recipe_id = String(req.params.recipeid);
     await user_utils.MarkAsVeiwed(user_id,recipe_id);
     res.status(200).send("The Recipe successfully saved as viewed");
     } catch(error){
@@ -142,7 +111,7 @@ router.get('/my-last-watched', async (req,res,next) => {
 
 });
 
-
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  * This path return the my-last-searches reciepes of the logged-in user
  */
@@ -150,7 +119,10 @@ router.get('/my-last-searches', async (req,res,next) => {
   try{
     const user_id = req.session.user_id;
     const recipe_id = await user_utils.getLastSearch(user_id); // get the recipe id and query of the last searche from the DB table
-    const recipe_details = await recipes_get_utils.getRecipeDetails([recipe_id],user_id); // get the recipe details from the DB or spoonacular
+    if (!recipe_id) {
+      return res.status(404).send({ message: "No recent searches found." });
+    }
+    const recipe_details = await recipes_get_utils.getRecipeDetails([recipe_id.recipe_id],user_id); // get the recipe details from the DB or spoonacular
     res.status(200).send({recipe_details}); 
   }catch (error){
     console.error("error: ", error);
@@ -178,5 +150,37 @@ router.get('/my_family', async (req,res,next) => {
   }
 
 });
+
+
+  /**
+   * This path create recipe 
+   */
+  router.post('/my_recipes', async (req,res,next) => {
+    try{
+      const user_id = req.session.user_id;
+      let recipe_details = {
+      title: req.body.title,
+      image: req.body.image,
+      readyInMinutes: req.body.readyInMinutes,
+      popularity: req.body.popularity, 
+      isvegan: req.body.isvegan,
+      isvegetarian: req.body.isvegetarian,
+      isglutenFree: req.body.isglutenFree,
+      ingredients: req.body.ingredients,
+      instructions: req.body.instructions,
+      servings: req.body.servings,
+      createrBy: user_id,
+      isFamily: req.body.isFamily,
+      familyMember: req.body.familyMember,
+      occusion: req.body.occusion
+      }
+      const recipe_id = await recipes_post_utils.createRecipe(user_id,recipe_details); // create the recipe in the DB
+      res.status(200).send("The Recipe successfully saved");
+    }catch(error){
+      console.error("error: ", error);
+      next(error);
+    }
+  });
+
 
 module.exports = router;
