@@ -30,8 +30,6 @@ app.use(express.static(path.join(__dirname, "dist")));
 //remote:
 // app.use(express.static(path.join(__dirname, '../assignment-3-3-frontend/dist')));
 
-// using swagger UI to see API
-app.use('/docs', express.static(path.join(__dirname, 'swagger')));
 
 
 app.get("/",function(req,res)
