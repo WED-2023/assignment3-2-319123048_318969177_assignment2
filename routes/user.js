@@ -4,6 +4,7 @@ const DButils = require("./utils/DButils");
 const user_utils = require("./utils/user_utils");
 const recipes_help_utils = require("./utils/recipes_help_utils");
 const recipes_get_utils = require("./utils/recipes_get_utils");
+const recipes_post_utils = require("./utils/recipes_post_utils");
 
 /**
  * Authenticate all incoming requests by middleware
@@ -47,7 +48,7 @@ router.get('/my_favorites', async (req,res,next) => {
     let recipes_id_array = [];
     recipes_id.map((element) => recipes_id_array.push(element.recipe_id)); //extracting the recipe ids into string array 
     //for each recipe id, we get the recipe details from the DB or spoonacular
-    const results = await recipes_get_utils.getRecipeDetails(recipes_id_array); 
+    const results = await recipes_get_utils.getRecipeDetails(recipes_id_array,user_id); 
     res.status(200).send(results); // returning the recipes details
   } catch(error){
     console.error("error: ", error);
@@ -66,12 +67,43 @@ router.get('/my_recipes', async (req,res,next) => {
     const recipes_id = await user_utils.getRecipes(user_id); //returns the recipes ids from the DB table
     let recipes_id_array = [];
     recipes_id.map((element) => recipes_id_array.push(element.recipe_id)); //extracting the recipe ids into string array 
-    const results = await recipes_help_utils.getLocalRecipes(recipes_id_array); 
+    const results = await recipes_help_utils.getLocalRecipes(recipes_id_array,user_id); 
     res.status(200).send(results);
   }catch(error){
     console.error("error: ", error);
     next(error);
   }});
+
+
+  /**
+   * This path create recipe 
+   */
+  router.post('/my_recipes', async (req,res,next) => {
+    try{
+      const user_id = req.session.user_id;
+      let recipe_details = {
+      title: req.body.title,
+      image: req.body.image,
+      readyInMinutes: req.body.readyInMinutes,
+      popularity: req.body.popularity, 
+      isvegan: req.body.isvegan,
+      isvegetarian: req.body.isvegetarian,
+      isglutenFree: req.body.isglutenFree,
+      ingredients: req.body.ingredients,
+      instructions: req.body.instructions,
+      servings: req.body.servings,
+      createrBy: user_id,
+      isFamily: req.body.isFamily,
+      familyMember: req.body.familyMember,
+      occusion: req.body.occusion
+      }
+      const recipe_id = await recipes_post_utils.createRecipe(user_id,recipe_details); // create the recipe in the DB
+      res.status(200).send("The Recipe successfully saved");
+    }catch(error){
+      console.error("error: ", error);
+      next(error);
+    }
+  });
 
 
 /**
@@ -102,7 +134,7 @@ router.get('/my-last-watched', async (req,res,next) => {
     let recipes_id_array = [];
     recipes_id.map((element) => recipes_id_array.push(element.recipe_id)); //extracting the recipe ids into string array 
     //for each recipe id, we get the recipe details from the DB or spoonacular
-    const results = await recipes_get_utils.getRecipeDetails(recipes_id_array); 
+    const results = await recipes_get_utils.getRecipeDetails(recipes_id_array,user_id); 
     res.status(200).send(results); // returning the recipes details
   }catch(error){
     console.error("error: ", error);
@@ -119,7 +151,7 @@ router.get('/my-last-searches', async (req,res,next) => {
   try{
     const user_id = req.session.user_id;
     const recipe_id = await user_utils.getLastSearch(user_id); // get the recipe id and query of the last searche from the DB table
-    const recipe_details = await recipes_get_utils.getRecipeDetails([recipe_id]); // get the recipe details from the DB or spoonacular
+    const recipe_details = await recipes_get_utils.getRecipeDetails([recipe_id],user_id); // get the recipe details from the DB or spoonacular
     res.status(200).send({recipe_details}); 
   }catch (error){
     console.error("error: ", error);
@@ -139,7 +171,7 @@ router.get('/my_family', async (req,res,next) => {
     let recipes_id_array = [];
     recipes_id.map((element) => recipes_id_array.push(element.recipe_id)); //extracting the recipe ids into string array 
     //for each recipe id, we get the recipe details from the DB or spoonacular
-    const results = await recipes_help_utils.getLocalRecipes(recipes_id_array); 
+    const results = await recipes_help_utils.getLocalRecipes(recipes_id_array,user_id); 
     res.status(200).send(results); // returning the recipes details
   }catch(error){
     console.error("error: ", error);

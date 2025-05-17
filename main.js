@@ -86,9 +86,6 @@ app.use("/api/auth", auth);
 
 
 
-
-
-
 // Default router
 app.use(function (err, req, res, next) {
   console.error(err);

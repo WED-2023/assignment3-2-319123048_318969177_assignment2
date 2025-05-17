@@ -1,0 +1,5 @@
+# In auth/resigster - change to response 409 for used username
+# In user schema - add the field profile_image as string
+# In auth/login - change the message of the 401 response to "Invalid username or password"
+# In User - add the option to create recipe
+# In Recipe scheme - change the id field to be a string, so recipes from DB are strings with ID at the end

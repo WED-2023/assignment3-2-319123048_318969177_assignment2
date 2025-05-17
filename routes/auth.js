@@ -23,7 +23,7 @@ router.post("/register", async (req, res, next) => {
     //needs to change to status 400 or add 409 to the API in the future
     // check that username is not taken
     if (users.find((x) => x.username === user_details.username))
-      throw { status: 409, message: "Username taken" };
+      throw { status: 409, message: "Username already exists" };
 
     // add the new username
     let hash_password = bcrypt.hashSync(
@@ -66,7 +66,7 @@ router.post("/login", async (req, res, next) => {
 
     // return cookie
     res.status(200).send({
-      message: "login succeeded",
+      message: "Login successful",
       success: true,
       username: user.username
     });

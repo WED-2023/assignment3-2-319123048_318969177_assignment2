@@ -23,6 +23,15 @@ async function MarkAsVeiwed(user_id,recipe_id) {
     await DButils.execQuery(`insert into viewed_recipes values ('${user_id}',${recipe_id})`);
 }
 
+// synchronic function to get the recipe IDs of the viewed recipes of the logged-in user
+async function getAllViewedRecipes(user_id) {
+  const recipes_id = await DButils.execQuery(`
+    SELECT recipe_id
+    FROM viewed_recipes
+    WHERE user_id = '${user_id}'
+  `);
+  return recipes_id;
+}
 // synchonic function to get the 3 last viewed recipes of the logged-in user from DB
 async function getViewedRecipes(user_id) {
   const recipes_id = await DButils.execQuery(`
@@ -66,5 +75,6 @@ module.exports = {
     MarkAsVeiwed,
     getFamilyRecipes,
     getLastSearch,
-    getViewedRecipes
+    getViewedRecipes,
+    getAllViewedRecipes
 };

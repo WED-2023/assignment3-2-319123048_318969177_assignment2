@@ -65,8 +65,8 @@ paths:
       responses:
         '201':
           description: User registered
-        '400':
-          description: Invalid input
+        '409':
+          description: Username already exists
           content:
             application/json:
               schema:
@@ -100,7 +100,7 @@ paths:
                 example:
                   username: noapatch
         '401':
-          description: Invalid credentials
+          description: Username or Password incorrect
           content:
             application/json:
               schema:
@@ -196,6 +196,48 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
+    post:
+      tags: [User]
+      summary: Create a new recipe
+      description: Add a new recipe to the database. Can be a regular recipe or family recipe.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/Recipe'
+                - type: object
+                  properties:
+                    isFamily:
+                      type: boolean
+                      description: Set to true to mark this as a family recipe
+                      default: false
+                    familyMember:
+                      type: string
+                      description: Name of the family member who provided the recipe (required if isFamily is true)
+                    occasion:
+                      type: string
+                      description: When this dish is typically prepared in the family
+      responses:
+        '201':
+          description: Recipe created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Recipe'
+        '400':
+          description: Invalid input (e.g., family recipe without familyMember)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'   
                 
   /user/{recipeid}/viewed:
     post:
@@ -297,7 +339,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'     
-          
+
+    
 
   /recipes:
     get:
@@ -362,48 +405,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-    post:
-      tags: [Recipe]
-      summary: Create a new recipe
-      description: Add a new recipe to the database. Can be a regular recipe or family recipe.
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              allOf:
-                - $ref: '#/components/schemas/Recipe'
-                - type: object
-                  properties:
-                    isFamily:
-                      type: boolean
-                      description: Set to true to mark this as a family recipe
-                      default: false
-                    familyMember:
-                      type: string
-                      description: Name of the family member who provided the recipe (required if isFamily is true)
-                    occasion:
-                      type: string
-                      description: When this dish is typically prepared in the family
-      responses:
-        '201':
-          description: Recipe created
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Recipe'
-        '400':
-          description: Invalid input (e.g., family recipe without familyMember)
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+
                 
                 
   /recipes/{recipeId}:
@@ -554,6 +556,7 @@ components:
         - country
         - password
         - email
+        - profileImage
       properties:
         username:
           type: string
@@ -589,6 +592,11 @@ components:
         email:
           type: string
           format: email
+        profileImage:
+          type: string
+          format: url
+          description: URL to the user's profile image
+          example: https://example.com/profile.jpg
           
           
     LoginRequest:
@@ -649,9 +657,8 @@ components:
         - servings
       properties:
         id:
-          type: integer
-          format: int64
-          example: 123
+          type: string
+          example: '123ID'
         overview:
           $ref: '#/components/schemas/RecipeOverview'
         ingredients:

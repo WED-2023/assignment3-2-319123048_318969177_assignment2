@@ -2,20 +2,35 @@ const axios = require("axios");
 const api_domain = "https://api.spoonacular.com/recipes";
 const DButils = require("./DButils");
 const recipes_get_utils = require("./recipes_get_utils");
+const user_utils = require("./user_utils");
 /**
  * This file is for all the functions that help the logic of the recipes, and are 'private' to the recipes
  */
 
 
 // function to get the recipes overview from the Spoonacular API, using the existing functions
-async function getSpoonacularRecipes(spoonacularIds) {
+async function getSpoonacularRecipes(spoonacularIds,user_id) {
   if (spoonacularIds.length === 0) return [];
 
-  try {
-    // Parallel fetching all Spoonacular recipes
+    try {
+    const [favorites, viewed] = user_id
+      ? await Promise.all([
+          user_utils.getFavoriteRecipeIds(user_id),
+          user_utils.getViewedRecipeIds(user_id)
+        ])
+      : [[], []];
+
     const results = await Promise.all(
-      spoonacularIds.map(id => recipes_get_utils.getRecipeOverViewSpoonacular(id))
+      spoonacularIds.map(async (id) => {
+        const recipe = await recipes_get_utils.getRecipeOverViewSpoonacular(id);
+        return {
+          ...recipe,
+          isFavorite: favorites.includes(id.toString()),
+          isWatched: viewed.includes(id.toString())
+        };
+      })
     );
+
     return results;
   } catch (err) {
     console.error("Spoonacular fetch error:", err.message);
@@ -24,10 +39,9 @@ async function getSpoonacularRecipes(spoonacularIds) {
 }
 
 // function to get the recipes overview from the DB
-async function getLocalRecipes(localRecipes) {
+async function getLocalRecipes(localRecipes, user_id) {
   if (localRecipes.length === 0) return [];
 
-  // Format IDs for SQL IN clause, e.g., ('102ID','103ID')
   const formattedIds = localRecipes.map(id => `'${id}'`).join(",");
 
   const query = `
@@ -37,7 +51,12 @@ async function getLocalRecipes(localRecipes) {
   `;
 
   try {
-    const localResults = await DButils.execQuery(query);
+    const [localResults, favorites, viewed] = await Promise.all([
+      DButils.execQuery(query),
+      user_id ? user_utils.getFavoriteRecipes(user_id) : [],
+      user_id ? user_utils.getAllViewedRecipes(user_id) : []
+    ]);
+
     return localResults.map(recipe => ({
       id: recipe.recipe_id,
       title: recipe.title,
@@ -47,6 +66,8 @@ async function getLocalRecipes(localRecipes) {
       vegan: recipe.vegan,
       vegetarian: recipe.vegetarian,
       glutenFree: recipe.gluten_free,
+      isFavorite: favorites.includes(recipe.recipe_id),
+      isWatched: viewed.includes(recipe.recipe_id)
     }));
   } catch (err) {
     console.error("DB fetch error:", err.message);

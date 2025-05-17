@@ -36,7 +36,7 @@ async function getRecipeOverViewSpoonacular(recipe_id) {
 }
 
 // synchonic function that get array of recipes IDs, and returns the recipes OverView in JSON format
-async function getRecipeDetails(recipeIds_array) {
+async function getRecipeDetails(recipeIds_array,user_id) {
   const localRecipes = [];
   const spoonacularIds = [];
 
@@ -49,8 +49,8 @@ async function getRecipeDetails(recipeIds_array) {
     }
   }
 
-  const localResults = await recipes_help_utils.getLocalRecipes(localRecipes);
-  const spoonacularResults = await recipes_help_utils.getSpoonacularRecipes(spoonacularIds);
+  const localResults = await recipes_help_utils.getLocalRecipes(localRecipes,user_id);
+  const spoonacularResults = await recipes_help_utils.getSpoonacularRecipes(spoonacularIds,user_id);
 
   return [...localResults, ...spoonacularResults];
 
