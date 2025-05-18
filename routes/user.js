@@ -111,7 +111,7 @@ router.get('/my-last-watched', async (req,res,next) => {
 
 });
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 /**
  * This path return the my-last-searches reciepes of the logged-in user
  */
@@ -122,8 +122,9 @@ router.get('/my-last-searches', async (req,res,next) => {
     if (!recipe_id) {
       return res.status(404).send({ message: "No recent searches found." });
     }
-    const recipe_details = await recipes_get_utils.getRecipeDetails([recipe_id.recipe_id],user_id); // get the recipe details from the DB or spoonacular
-    res.status(200).send({recipe_details}); 
+    const recipeIds = recipe_id.map(r => r.recipe_id);
+    const recipe_details = await recipes_get_utils.getRecipeDetails(recipeIds,user_id); // get the recipe details from the DB or spoonacular
+    res.status(200).send(recipe_details); 
   }catch (error){
     console.error("error: ", error);
     next(error);
@@ -139,6 +140,9 @@ router.get('/my_family', async (req,res,next) => {
   try{
     const user_id = req.session.user_id;
     const recipes_id = await user_utils.getFamilyRecipes(user_id); // get the recipe ids of the family recipes from the DB table
+    if (!recipes_id) {  
+      return res.status(404).send({ message: "No family recipes found." });
+    }
     let recipes_id_array = [];
     recipes_id.map((element) => recipes_id_array.push(element.recipe_id)); //extracting the recipe ids into string array 
     //for each recipe id, we get the recipe details from the DB or spoonacular

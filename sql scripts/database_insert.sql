@@ -81,7 +81,7 @@ VALUES
 
 INSERT INTO user_searches (user_id, recipe_id, search_query, search_timestamp)
 VALUES
-(1, '1ID', 'vegan pasta', NOW()),
-(1, '2ID', 'cookies', NOW() - INTERVAL 1 DAY),
-(2, '3ID', 'shakshuka', NOW() - INTERVAL 2 DAY),
-(3, '4ID', 'chocolate brownies', NOW() - INTERVAL 3 DAY);
+(2, '1ID', 'vegan pasta', NOW());
+-- (1, '2ID', 'cookies', NOW() - INTERVAL 1 DAY),
+-- (2, '3ID', 'shakshuka', NOW() - INTERVAL 2 DAY),
+-- (3, '4ID', 'chocolate brownies', NOW() - INTERVAL 3 DAY);

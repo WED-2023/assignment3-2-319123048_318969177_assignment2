@@ -44,17 +44,32 @@ async function getRecipeDetails(recipeIds_array, user_id) {
   const spoonacularIds = [];
 
   for (const id of recipeIds_array) {
-    if (typeof id === 'string' && id.includes("ID")) {
+    if(!id) continue; 
+    if (id.includes("ID")) {
       localRecipes.push(id);
     } else {
       spoonacularIds.push(id);
     }
   }
+  //if no recipe IDs are provided
+  if (localRecipes.length === 0 && spoonacularIds.length === 0) {
+    return []; 
+  }
+  if (localRecipes.length > 0 && spoonacularIds.length > 0) {
+    const localResults = await getLocalRecipes(localRecipes, user_id);
+  
+    const spoonacularResults = await getSpoonacularRecipes(spoonacularIds, user_id);
 
-  const localResults = await getLocalRecipes(localRecipes, user_id);
-  const spoonacularResults = await getSpoonacularRecipes(spoonacularIds, user_id);
-
-  return [...localResults, ...spoonacularResults];
+    return [...localResults, ...spoonacularResults];
+  }
+  // if only spoonacular IDs are provided
+  if (spoonacularIds.length > 0) {
+    return await getSpoonacularRecipes(spoonacularIds, user_id);
+  }
+  // if only local IDs are provided
+  if (localRecipes.length > 0) {
+    return await getLocalRecipes(localRecipes, user_id);
+  }
 }
 
 // function to get the recipes overview from the Spoonacular API
