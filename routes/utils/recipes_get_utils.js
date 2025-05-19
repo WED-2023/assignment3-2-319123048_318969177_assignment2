@@ -139,6 +139,40 @@ async function getLocalRecipes(localRecipes, user_id) {
 }
 
 
+// function to get 3 random recipes from the Spoonacular API
+async function getRandomSpoonacularRecipes() {
+    return await axios.get(`${api_domain}/random`, {
+        params: {
+            number: 3,
+            apiKey: process.env.spooncular_apiKey
+        }
+    });
+}
+
+// function to get 3 random recipes from the Spoonacular API
+async function getRandomRecipes() {
+    try {
+        const response = await getRandomSpoonacularRecipes();
+        const recipes = response?.data?.recipes;
+        if (!Array.isArray(recipes)) {
+            throw new Error("No recipes found in the Spoonacular response.");
+          }
+        const ids = recipes.map(recipe => recipe.id);
+        res = []
+        for (const recipe_id of ids) {
+          console.log("recipe_id", recipe_id);
+            recipe = await getRecipeOverViewSpoonacular(recipe_id);
+            res.push(recipe);
+        }
+        return res;
+    } catch (error) {
+        console.error("Error fetching random recipes:", error);
+        throw error;
+    }
+}
+
+
+
 module.exports = {
     // for multiple recipes from DB 
     getLocalRecipes,
@@ -149,5 +183,7 @@ module.exports = {
     // for multiple recipes from DB and Spoonacular
     getRecipeDetails,
     // get single recipe data from Spoonacular
-    getRecipeInformation
+    getRecipeInformation,
+    // get random recipes from Spoonacular
+    getRandomRecipes
 }
