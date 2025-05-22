@@ -3,7 +3,7 @@ const axios = require("axios");
 const api_domain = "https://api.spoonacular.com/recipes";
 var router = express.Router();
 const recipes_get_utils = require("./utils/recipes_get_utils");
-router.get("/", (req, res) => res.send("im here"));
+
 
 
 // /**
@@ -116,7 +116,7 @@ router.get("/:recipe_id", async (req, res, next) => {
 //             default: desc
 
 
-router.get( "/", async (req, res, next) => {
+router.get("",async (req, res, next) => {
     try{
         const criteria = req.query;
         const params = {
