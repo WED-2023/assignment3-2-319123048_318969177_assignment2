@@ -172,6 +172,18 @@ async function getRandomRecipes() {
 }
 
 
+function getRecipesID(res_response) {
+    return res_response.data.results.map(item => item.id);
+}
+
+// GET https://api.spoonacular.com/recipes/complexSearch 
+//GET https://api.spoonacular.com/recipes/complexSearch?query=pasta&maxFat=25&number=2
+async function getRecipeComplex(params) {
+    return await axios.get(`${api_domain}/complexSearch`, {
+        params
+    });
+}
+
 
 module.exports = {
     // for multiple recipes from DB 
@@ -185,5 +197,10 @@ module.exports = {
     // get single recipe data from Spoonacular
     getRecipeInformation,
     // get random recipes from Spoonacular
-    getRandomRecipes
+    getRandomRecipes,
+    //
+    getRecipesID,
+    //
+    getRecipeComplex
+    
 }
