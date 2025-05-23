@@ -3,21 +3,7 @@ const axios = require("axios");
 const api_domain = "https://api.spoonacular.com/recipes";
 var router = express.Router();
 const recipes_get_utils = require("./utils/recipes_get_utils");
-
-
-
-// /**
-//  * This path returns a full details of a recipe by its id 
-//  */
-// router.get("/:recipeId", async (req, res, next) => {
-//   try {
-//     const recipe = await recipes_get_utils.getRecipeOverView(req.params.recipeId);
-//     res.send(recipe);
-//   } catch (error) {
-//     next(error);
-//   }
-// });
-
+const recipes_post_utils = require("./utils/recipes_post_utils");
 
 /**
  * This path return 3 random recipes from spoonacular API
@@ -37,11 +23,10 @@ router.get("/random", async (req, res, next) => {
     }
 });
 
-// /recipes/{recipeid}:
-//     get:
-//       tags: [Recipe]
-//       summary: Get a specific recipe by ID
 
+/** 
+ * This path return a recipe by id from spoonacular API
+ */
 
 router.get("/:recipe_id", async (req, res, next) => {
     try{
@@ -57,64 +42,42 @@ router.get("/:recipe_id", async (req, res, next) => {
         }
     });
 
-//   /recipes/{recipeid}/like:
-//     put:
-//       tags: [Recipe]
-//       summary: Like a recipe
-//       description: Increase the popularity count (likes) of a recipe
+/** 
+ * This path add like to recipe, if the recipe is not in the DB bring it from spoonacular API or from recipe DB
+ * add it to the likes table and update the recipe popularity
+ */
+
+router.post("/:recipe_id/likes", async (req, res, next) => {
+    try{
+        const recipe_form_DB = await recipes_get_utils.getFromLikeDB(req.params.recipe_id);
+        // if the recipe is not in the likes table, bring it from spoonacular API
+        if(!recipe_form_DB){
+            // bring the recipe from spoonacular API as overview
+            const recipe = await recipes_get_utils.getRecipeOverViewSpoonacular(req.params.recipe_id);
+            // add the recipe to likes table using id + popularity
+            const recipe_id_popularity = await recipes_post_utils.addRecipeToLikeDB(recipe.id, recipe.popularity);
+            res.status(200).send(recipe_id_popularity);
+        }
+        // if the recipe is in the likes DB, update the popularity and return it
+        else{
+            const recipe = await recipes_post_utils.updateRecipePopularity(recipe_form_DB.id, recipe_form_DB.popularity);
+            res.status(200).send(recipe);
+        }
+
+    }catch (error) {
+        console.log("Error in like recipe: ", error);
+        next(error);
+    }
+
+});
 
 
 
-
-// /recipes:
-//     get:
-//       tags: [Recipe]
-//       summary: Get recipes based on search criteria
-//       description: Retrieve recipes with pagination (5, 10, or 15 results)
-//       parameters:
-//         - name: limit
-//           in: query
-//           description: Number of recipes to return (5, 10, or 15)
-//           required: true
-//           schema:
-//             type: integer
-//             enum: [5, 10, 15]
-//             default: 5
-//         - name: query
-//           in: query
-//           description: Search term for recipe title
-//           schema:
-//             type: string
-//         - name: cuisine
-//           in: query
-//           description: Filter by cuisine type
-//           schema:
-//             type: string
-//         - name: diet
-//           in: query
-//           description: Filter by diet type
-//           schema:
-//             type: string
-//         - name: intolerances
-//           in: query
-//           description: Filter by food intolerances
-//           schema:
-//             type: string
-//         - name: sortBy
-//           in: query
-//           description: Field to sort results by
-//           schema:
-//             type: string
-//             enum: [readyInMinutes, popularity]
-//             default: popularity
-//         - name: sortDirection
-//           in: query
-//           description: Direction of sort
-//           schema:
-//             type: string
-//             enum: [asc, desc]
-//             default: desc
-
+/** 
+ * This path return a recipe from spoonacular API by criterias for searching
+ * Default limit is 5
+ * Can search by query, cuisine, diet, intolerances, sortBy and sortDirection
+ */
 
 router.get("",async (req, res, next) => {
     try{

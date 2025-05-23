@@ -85,3 +85,9 @@ VALUES
 -- (1, '2ID', 'cookies', NOW() - INTERVAL 1 DAY),
 -- (2, '3ID', 'shakshuka', NOW() - INTERVAL 2 DAY),
 -- (3, '4ID', 'chocolate brownies', NOW() - INTERVAL 3 DAY);
+
+
+INSERT INTO recipe_likes (recipe_id, likes_count) VALUES
+('1ID', 10),
+('2ID', 25),
+('716429', 209);

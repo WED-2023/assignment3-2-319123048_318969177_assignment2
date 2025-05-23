@@ -72,68 +72,8 @@ CREATE TABLE IF NOT EXISTS user_searches (
     FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
 
--- -- Insert sample family recipes (optional - for testing)
--- INSERT INTO recipes (
---     title, ready_in_minutes, image, popularity, vegan, vegetarian, gluten_free, 
---     instructions, servings, user_id, is_family, family_member, occasion
--- ) VALUES 
--- (
---     'Grandma\'s Apple Pie', 
---     60, 
---     'https://example.com/apple_pie.jpg', 
---     0, 
---     FALSE, 
---     TRUE, 
---     FALSE, 
---     '[\"Prepare the dough\", \"Peel and slice apples\", \"Mix apples with sugar and cinnamon\", \"Place in pie dish\", \"Bake for 45 minutes\"]', 
---     8, 
---     1, 
---     TRUE, 
---     'Grandma Sarah', 
---     'Family gatherings'
--- ),
--- (
---     'Uncle\'s Chicken Soup', 
---     90, 
---     'https://example.com/chicken_soup.jpg', 
---     0, 
---     FALSE, 
---     FALSE, 
---     TRUE, 
---     '[\"Boil chicken\", \"Add vegetables\", \"Add spices\", \"Simmer for 1 hour\"]', 
---     6, 
---     1, 
---     TRUE, 
---     'Uncle David', 
---     'Winter meals'
--- ),
--- (
---     'Mom\'s Special Cookies', 
---     30, 
---     'https://example.com/cookies.jpg', 
---     0, 
---     FALSE, 
---     TRUE, 
---     FALSE, 
---     '[\"Mix ingredients\", \"Form cookies\", \"Bake for 15 minutes\"]', 
---     24, 
---     1, 
---     TRUE, 
---     'Mom', 
---     'Holidays'
--- );
 
--- -- Insert sample ingredients for family recipes
--- INSERT INTO ingredients (recipe_id, name, amount, unit) VALUES
--- (1, 'flour', 2, 'cups'),
--- (1, 'apples', 6, 'units'),
--- (1, 'sugar', 1, 'cup'),
--- (1, 'cinnamon', 1, 'teaspoon'),
--- (2, 'chicken', 1, 'whole'),
--- (2, 'carrots', 3, 'units'),
--- (2, 'celery', 2, 'stalks'),
--- (2, 'onion', 1, 'unit'),
--- (3, 'flour', 2, 'cups'),
--- (3, 'sugar', 1, 'cup'),
--- (3, 'butter', 200, 'grams'),
--- (3, 'chocolate chips', 1, 'cup');
+CREATE TABLE IF NOT EXISTS recipe_likes (
+    recipe_id VARCHAR(255) NOT NULL PRIMARY KEY,
+    likes_count INT NOT NULL DEFAULT 0
+);

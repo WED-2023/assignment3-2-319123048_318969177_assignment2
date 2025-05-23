@@ -171,19 +171,27 @@ async function getRandomRecipes() {
     }
 }
 
-
+// function to get the recipe id as a list 
 function getRecipesID(res_response) {
     return res_response.data.results.map(item => item.id);
 }
 
+// function to get recipes from the Spoonacular API using complex search
 // GET https://api.spoonacular.com/recipes/complexSearch 
-//GET https://api.spoonacular.com/recipes/complexSearch?query=pasta&maxFat=25&number=2
 async function getRecipeComplex(params) {
     return await axios.get(`${api_domain}/complexSearch`, {
         params
     });
 }
 
+// function to get the recipe id and popularity from the likes table
+async function getFromLikeDB(recipe_id) {
+  const result = await DButils.execQuery(
+    `SELECT recipe_id, likes_count FROM recipe_likes WHERE recipe_id = '${recipe_id}'`
+  );
+  if (result.length === 0) return null;
+  return { id: result[0].recipe_id, popularity: result[0].likes_count };
+}
 
 module.exports = {
     // for multiple recipes from DB 
@@ -198,9 +206,11 @@ module.exports = {
     getRecipeInformation,
     // get random recipes from Spoonacular
     getRandomRecipes,
-    //
+    //map id to list
     getRecipesID,
-    //
-    getRecipeComplex
+    // get recipes from Spoonacular using complex search
+    getRecipeComplex,
+    // get recipe id and popularity from the likes table
+    getFromLikeDB
     
 }
