@@ -1,3 +1,4 @@
+USE mydb;
 -- Users table
 CREATE TABLE IF NOT EXISTS users (
     user_id INT AUTO_INCREMENT PRIMARY KEY,

@@ -39,10 +39,10 @@ INSERT INTO recipes (
     created_by, is_family, family_member, occasion
 )
 VALUES
-('1ID', 1, 'Noa’s Vegan Pasta', 30, 'https://example.com/pasta.jpg', 50, TRUE, TRUE, TRUE, '["Boil pasta", "Add sauce"]', 2, 'Noa', FALSE, NULL, NULL),
-('2ID', 1, 'Grandma’s Cookies', 45, 'https://example.com/cookies.jpg', 80, FALSE, TRUE, FALSE, '["Mix dough", "Bake"]', 12, 'Noa', TRUE, 'Grandma', 'Holiday'),
-('3ID', 2, 'Neta’s Shakshuka', 25, 'https://example.com/shakshuka.jpg', 65, FALSE, TRUE, TRUE, '["Cook tomatoes", "Add eggs"]', 4, 'Neta', FALSE, NULL, NULL),
-('4ID', 3, 'Yaki’s Brownies', 40, 'https://example.com/brownies.jpg', 90, FALSE, TRUE, FALSE, '["Prepare batter", "Bake"]', 8, 'Yaki', TRUE, 'Mom', 'Birthday');
+('1ID', 2, 'Noa’s Vegan Pasta', 30, 'https://example.com/pasta.jpg', 50, TRUE, TRUE, TRUE, '["Boil pasta", "Add sauce"]', 2, 'Noa', FALSE, NULL, NULL),
+('2ID', 3, 'Grandma’s Cookies', 45, 'https://example.com/cookies.jpg', 80, FALSE, TRUE, FALSE, '["Mix dough", "Bake"]', 12, 'Noa', TRUE, 'Grandma', 'Holiday'),
+('3ID', 3, 'Neta’s Shakshuka', 25, 'https://example.com/shakshuka.jpg', 65, FALSE, TRUE, TRUE, '["Cook tomatoes", "Add eggs"]', 4, 'Neta', FALSE, NULL, NULL),
+('4ID', 1, 'Yaki’s Brownies', 40, 'https://example.com/brownies.jpg', 90, FALSE, TRUE, FALSE, '["Prepare batter", "Bake"]', 8, 'Yaki', TRUE, 'Mom', 'Birthday');
 
 
 INSERT INTO ingredients (recipe_id, name, amount, unit)
@@ -81,13 +81,11 @@ VALUES
 
 INSERT INTO user_searches (user_id, recipe_id, search_query, search_timestamp)
 VALUES
-(2, '1ID', 'vegan pasta', NOW());
--- (1, '2ID', 'cookies', NOW() - INTERVAL 1 DAY),
--- (2, '3ID', 'shakshuka', NOW() - INTERVAL 2 DAY),
--- (3, '4ID', 'chocolate brownies', NOW() - INTERVAL 3 DAY);
+(2, '1ID', 'vegan pasta', NOW()),
+(1, '2ID', 'cookies', NOW() - INTERVAL 1 DAY),
+(2, '3ID', 'shakshuka', NOW() - INTERVAL 2 DAY),
+(3, '4ID', 'chocolate brownies', NOW() - INTERVAL 3 DAY);
 
 
 INSERT INTO recipe_likes (recipe_id, likes_count) VALUES
-('1ID', 10),
-('2ID', 25),
 ('716429', 209);

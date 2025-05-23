@@ -31,11 +31,22 @@ router.get("/random", async (req, res, next) => {
 router.get("/:recipe_id", async (req, res, next) => {
     try{
         const recipe_id = String(req.params.recipeid);
-        const reciepe = await recipes_get_utils.getRecipeOverViewSpoonacular(recipe_id);
-        if(!reciepe){
-            res.status(404).send("No such recipe with the given id");
+        // check if the recipe_id is from DB
+        if (recipe_id.includes("ID")){
+            const recipe = await recipes_get_utils.getRecipeFromDB(recipe_id);
+            if(!recipe){
+                res.status(404).send("No such recipe with the given id");
+            }
+            res.status(200).send(recipe);
         }
-        res.status(200).send(recipe); 
+        // the recipe_id is from spoonacular
+        else{
+            const reciepe = await recipes_get_utils.getRecipeSpoonacular(int(recipe_id));
+            if(!reciepe){
+                res.status(404).send("No such recipe with the given id");
+            }
+            res.status(200).send(recipe);
+        } 
         } catch(error){
             console.log("Error in get recipe by id: ",error);
             next(error);

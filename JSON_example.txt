@@ -8,6 +8,24 @@
   "email": "yakin@example.com",
   "profilePic": "https://example.com/yaki.jpg"
 }
+{
+  "username": "noa123",
+  "firstname": "Noa",
+  "lastname": "Patchornik",
+  "country": "Israel",
+  "password": "WhyMe27!", 
+  "email": "noa123@example.com",
+  "profilePic": "https://example.com/noa.jpg"
+}
+{
+  "username": "neta",
+  "firstname": "Nete",
+  "lastname": "Patchornik",
+  "country": "Israel",
+  "password": "BeachVibe30?", 
+  "email": "neta@example.com",
+  "profilePic": "https://example.com/neta.jpg"
+}
 
 # example for login request:
 {

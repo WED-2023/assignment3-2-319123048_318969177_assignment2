@@ -3,5 +3,6 @@
 # In auth/login - change the message of the 401 response to "Invalid username or password"
 # In User - add the option to create recipe
 # In Recipe scheme - change the id field to be a string, so recipes from DB are strings with ID at the end
-# in Recipes/ (complex search) make the query param a requierd field
-# in recipes/ (complex search) set the limit field to not requierd 
+# In Recipes - (complex search) make the query param a requierd field
+# In Recipes - action get (complex search) set the limit field to not requierd 
+# In Recipes - deleting the option to patch (update) a recipe

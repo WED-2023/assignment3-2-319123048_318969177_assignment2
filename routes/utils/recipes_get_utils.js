@@ -193,6 +193,121 @@ async function getFromLikeDB(recipe_id) {
   return { id: result[0].recipe_id, popularity: result[0].likes_count };
 }
 
+// function to extract recipe details from the Spoonacular API response
+async function extractRecipeDetails(recipe) {
+  const {
+    id,
+    title,
+    image,
+    readyInMinutes,
+    aggregateLikes,
+    vegan,
+    vegetarian,
+    glutenFree,
+    servings,
+    instructions,
+    extendedIngredients,
+    creditsText,     
+    occasions        
+  } = recipe;
+
+  // Extract ingredients with name, amount, unit
+  const ingredients = extendedIngredients.map(ingredient => ({
+    name: ingredient.name,
+    amount: ingredient.amount,
+    unit: ingredient.unit
+  }));
+
+  // Handle instructions array 
+  const instructionSteps = recipe.analyzedInstructions?.length > 0
+    ? recipe.analyzedInstructions[0].steps.map(step => step.step)
+    : instructions ? [instructions] : [];
+
+  // Extract occasion if exists (first one, or null)
+  const occasion = occasions.length > 0 ? occasions[0] : null;
+
+  return {
+    id,
+    title,
+    image,
+    readyInMinutes,
+    popularity: aggregateLikes,
+    vegan,
+    vegetarian,
+    glutenFree,
+    servings,
+    instructions: instructionSteps,
+    ingredients,
+    createdBy: creditsText || "unknown",
+    occasion
+  };
+}
+
+
+// function to get all the data about the recipe from Spoonacular API
+async function getRecipeSpoonacular(recipe_id) {
+    const recipe = await getRecipeInformation(recipe_id);
+    if (!recipe) {
+        return null;
+    }
+    const recipeDetails = await extractRecipeDetails(recipe.data);
+    return recipeDetails;
+}
+
+
+// function to gat all the data about the recipe from DB
+async function getRecipeFromDB(recipe_id) {
+    try {
+      const recipeQuery = `
+        SELECT *
+        FROM recipes
+        WHERE recipe_id = '${recipe_id}'
+      `;
+      const [recipe] = await DButils.execQuery(recipeQuery);
+
+      const ingredientsQuery = `
+        SELECT name, amount, unit
+        FROM ingredients
+        WHERE recipe_id = '${recipe_id}'
+      `;
+      const ingredients = await DButils.execQuery(ingredientsQuery);
+
+    
+      let instructionSteps = [];
+      try {
+        instructionSteps = JSON.parse(recipe.instructions);
+      } catch (e) {
+        instructionSteps = recipe.instructions ? [recipe.instructions] : [];
+      }
+
+    
+      return {
+        id: recipe.recipe_id,
+        title: recipe.title,
+        image: recipe.image,
+        readyInMinutes: recipe.ready_in_minutes,
+        popularity: recipe.popularity,
+        vegan: Boolean(recipe.vegan),
+        vegetarian: Boolean(recipe.vegetarian),
+        glutenFree: Boolean(recipe.gluten_free),
+        servings: recipe.servings,
+        instructions: instructionSteps,
+        ingredients: ingredients.map(ing => ({
+          name: ing.name,
+          amount: ing.amount,
+          unit: ing.unit
+        })),
+        createdBy: recipe.created_by,
+        isFamily: recipe.isFamily || false,
+        familyMember: recipe.family_member || null,
+        occasion: recipe.occasion || null
+      };
+  } catch (error) {
+    console.error("Error fetching local recipe:", error.message);
+    throw error;
+  }
+}
+
 module.exports = {
     // for multiple recipes from DB 
     getLocalRecipes,
@@ -211,6 +326,10 @@ module.exports = {
     // get recipes from Spoonacular using complex search
     getRecipeComplex,
     // get recipe id and popularity from the likes table
-    getFromLikeDB
+    getFromLikeDB,
+    // get all the data about the recipe from Spoonacular API
+    getRecipeSpoonacular,
+    // get all details abput a recipe from DB
+    getRecipeFromDB
     
 }

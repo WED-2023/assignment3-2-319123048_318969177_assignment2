@@ -407,49 +407,6 @@ paths:
                 $ref: '#/components/schemas/Error'
 
                 
-                
-  /recipes/{recipeId}:
-      patch:
-        tags: [Recipe]
-        summary: Update one or more fields of a recipe by ID
-        parameters:
-          - name: recipeId
-            in: path
-            required: true
-            description: ID of the recipe to update
-            schema:
-              type: string
-        requestBody:
-          required: true
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RecipeUpdate'
-        responses:
-          '200':
-            description: Recipe updated successfully
-            content:
-              application/json:
-                schema:
-                  $ref: '#/components/schemas/Recipe'
-          '400':
-            description: Invalid input
-            content:
-              application/json:
-                schema:
-                  $ref: '#/components/schemas/Error'
-          '401':
-            description: Unauthorized – not the recipe owner
-            content:
-              application/json:
-                schema:
-                  $ref: '#/components/schemas/Error'
-          '404':
-            description: Recipe not found
-            content:
-              application/json:
-                schema:
-                  $ref: '#/components/schemas/Error'
         
   
   /recipes/random:
