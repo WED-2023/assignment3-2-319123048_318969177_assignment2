@@ -1,35 +1,6 @@
--- INSERT INTO users (username, firstname, lastname, country, password, email, profilePic)
--- VALUES
--- ('noa123', 'Noa', 'Patchornik', 'Israel', 'SuperSecure123!', 'noa@example.com', 'https://example.com/noa.jpg'),
--- ('yakin', 'Yaki', 'Naftali', 'Israel', 'What?2', 'yakin@example.com', 'https://example.com/yaki.jpg');
--- ('nat30' , 'Neta', 'Patchornik', 'Israel', 'Beach30!', 'neta30@example.com', 'https://example.com/neta.jpg')
 
 -- To users table use PostMan with url /auth/register
--- Spoonacular API example of recipes for pasta
--- {
---     "id": 642583,
---     "title": "Farfalle with Peas, Ham and Cream",
---     "image": "https://img.spoonacular.com/recipes/642583-312x231.jpg",
---     "imageType": "jpg"
--- },
--- {
---     "id": 715538,
---     "title": "What to make for dinner tonight?? Bruschetta Style Pork & Pasta",
---     "image": "https://img.spoonacular.com/recipes/715538-312x231.jpg",
---     "imageType": "jpg"
--- },
--- {
---     "id": 650126,
---     "title": "Linguine E Americana",
---     "image": "https://img.spoonacular.com/recipes/650126-312x231.jpg",
---     "imageType": "jpg"
--- },
--- {
---     "id": 634629,
---     "title": "Beef Lo Mein Noodles",
---     "image": "https://img.spoonacular.com/recipes/634629-312x231.jpg",
---     "imageType": "jpg"
--- }
+
 
 
 

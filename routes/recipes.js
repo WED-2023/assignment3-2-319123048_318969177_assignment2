@@ -58,7 +58,7 @@ router.get("/:recipe_id", async (req, res, next) => {
  * add it to the likes table and update the recipe popularity
  */
 
-router.post("/:recipe_id/likes", async (req, res, next) => {
+router.post("/:recipe_id/like", async (req, res, next) => {
     try{
         const recipe_form_DB = await recipes_get_utils.getFromLikeDB(req.params.recipe_id);
         // if the recipe is not in the likes table, bring it from spoonacular API

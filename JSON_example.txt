@@ -1,4 +1,4 @@
-# example for user JSON:
+## example for user JSON:
 {
   "username": "yakin",
   "firstname": "Yaki",
@@ -27,15 +27,15 @@
   "profilePic": "https://example.com/neta.jpg"
 }
 
-# example for login request:
+## example for login request:
 {
     "username": "noa123",
-    "password": "SuperSecure123!"
+    "password": "WhyMe27!"
 }
 
 # example for new recipe JSON:
 {
-  "title": "Vegan Pasta",
+  "title": "Tomato Pasta",
   "image": "https://example.com/pasta.jpg",
   "readyInMinutes": 30,
   "popularity": 0,
@@ -51,4 +51,9 @@
     { "name": "pasta", "amount": 200, "unit": "grams" },
     { "name": "tomato sauce", "amount": 100, "unit": "ml" }
   ]
+}
+
+## example for JSON for my_favorite 
+{
+  "recipeID" : "715449"
 }
