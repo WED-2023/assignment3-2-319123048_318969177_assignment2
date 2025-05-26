@@ -23,19 +23,34 @@ async function getRecipeInformation(recipe_id) {
 // synchonic function to get the recipes OverView in JSON format, from the Spoonacular API
 async function getRecipeOverViewSpoonacular(recipe_id) {
     let recipe_info = await getRecipeInformation(recipe_id);
-    let { id, title, readyInMinutes, image, aggregateLikes, vegan, vegetarian, glutenFree } = recipe_info.data;
+    let {
+        id,
+        title,
+        readyInMinutes,
+        image,
+        aggregateLikes,
+        vegan,
+        vegetarian,
+        glutenFree
+    } = recipe_info.data;
+
+    // Check if recipe is already in likes table
+    const recipeFromLikesDB = await getFromLikeDB(recipe_id);
+
+    const popularity = recipeFromLikesDB
+        ? recipeFromLikesDB.likes_count
+        : aggregateLikes;
 
     return {
         id: id,
         title: title,
         readyInMinutes: readyInMinutes,
         image: image,
-        popularity: aggregateLikes,
+        popularity: popularity,
         vegan: vegan,
         vegetarian: vegetarian,
-        glutenFree: glutenFree,
-        
-    }
+        glutenFree: glutenFree
+    };
 }
 
 // synchronic function that gets array of recipe IDs and returns recipes overview in JSON format
@@ -308,6 +323,17 @@ async function getRecipeFromDB(recipe_id) {
   }
 }
 
+
+// a function that get recipe ID and fetches from the DB the popularity
+async function getLocalRecipeLikes(recipe_id,user_id) {
+  
+    const result = await DButils.execQuery(
+        `SELECT popularity FROM recipes WHERE recipe_id = '${recipe_id}' and user_id = '${user_id}'`
+    );
+    if (result.length === 0) return null;
+    return result[0].popularity;
+}
+
 module.exports = {
     // for multiple recipes from DB 
     getLocalRecipes,
@@ -330,6 +356,8 @@ module.exports = {
     // get all the data about the recipe from Spoonacular API
     getRecipeSpoonacular,
     // get all details abput a recipe from DB
-    getRecipeFromDB
+    getRecipeFromDB,
+    // get from DB likes of a DB recipe
+    getLocalRecipeLikes
     
 }

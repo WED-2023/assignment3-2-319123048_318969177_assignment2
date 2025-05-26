@@ -53,33 +53,57 @@ router.get("/:recipe_id", async (req, res, next) => {
         }
     });
 
-/** 
- * This path add like to recipe, if the recipe is not in the DB bring it from spoonacular API or from recipe DB
- * add it to the likes table and update the recipe popularity
- */
+/**
+* This path add like to a recipe (both from API and DB)
+*/
 
 router.post("/:recipe_id/like", async (req, res, next) => {
-    try{
-        const recipe_form_DB = await recipes_get_utils.getFromLikeDB(req.params.recipe_id);
-        // if the recipe is not in the likes table, bring it from spoonacular API
-        if(!recipe_form_DB){
-            // bring the recipe from spoonacular API as overview
-            const recipe = await recipes_get_utils.getRecipeOverViewSpoonacular(req.params.recipe_id);
-            // add the recipe to likes table using id + popularity
-            const recipe_id_popularity = await recipes_post_utils.addRecipeToLikeDB(recipe.id, recipe.popularity);
-            res.status(200).send(recipe_id_popularity);
-        }
-        // if the recipe is in the likes DB, update the popularity and return it
-        else{
-            const recipe = await recipes_post_utils.updateRecipePopularity(recipe_form_DB.id, recipe_form_DB.popularity);
-            res.status(200).send(recipe);
+    try {
+        const recipe_id = String(req.params.recipe_id);
+        let recipeData;
+        let isUserRecipe = recipe_id.includes("ID");
+
+        // Check if the recipe is already in the likes table
+        const recipeInLikes = await recipes_get_utils.getFromLikeDB(recipe_id);
+
+        // if the recipe is not in the DB already
+        if (!recipeInLikes) {
+            // if the recipe is user's recipe
+            if (isUserRecipe) {
+                // if it's a user-created recipe, the user must be logged in and there is a session
+                recipeData = await recipes_get_utils.getLocalRecipeLikes(recipe_id, req.session.user_id);
+                if (!recipeData) throw new Error("Recipe not found in user DB");
+                // Add to recipe_likes and update popularity in both likes table and recipes table
+                await recipes_post_utils.addRecipeToLikeDB(recipe_id, 1);
+                await recipes_post_utils.updateRecipePopularityInUserDB(recipe_id, 1, req.session.user_id);
+                res.status(200).send({ success: true, recipe_id, popularity: 1 });
+            } else {
+                // Recipe from API - fetch overview
+                recipeData = await recipes_get_utils.getRecipeOverViewSpoonacular(recipe_id);
+                if (!recipeData) throw new Error("Recipe not found in Spoonacular API");
+
+                // Add to likes table
+                await recipes_post_utils.addRecipeToLikeDB(recipe_id, recipeData.popularity);
+                res.status(200).send({ success: true, recipe_id, popularity: recipeData.popularity+1 });
+            }
+        } else {
+            console.log("Recipe already liked: ", recipeInLikes, "type: " ,typeof recipeInLikes);
+            // If the recipe is already liked, increment the like count
+            recipeData = await recipes_post_utils.updateRecipePopularity(recipe_id, Number(recipeInLikes.popularity));
+
+            if (isUserRecipe) {
+                // Also update the popularity field in user-created recipe 
+                await recipes_post_utils.updateRecipePopularityInUserDB(recipe_id, Number(recipeInLikes.popularity), req.session.user_id);
+            }
+            res.status(200).send({ success: true, recipe_id, popularity: recipeData.updatedPopularity });
         }
 
-    }catch (error) {
-        console.log("Error in like recipe: ", error);
+        
+
+    } catch (error) {
+        console.error("Error in liking recipe:", error);
         next(error);
     }
-
 });
 
 

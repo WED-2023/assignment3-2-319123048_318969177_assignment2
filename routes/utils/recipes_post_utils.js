@@ -62,9 +62,22 @@ async function addRecipeToLikeDB(recipe_id, currentPopularity) {
   return {recipe_id, newPopularity};
 }
 
+
+// Update user's recipe popularity in the recipes table
+async function updateRecipePopularityInUserDB(recipe_id, currentPopularity,user_id) {
+  const updatedPopularity = currentPopularity + 1;
+  await DButils.execQuery(
+    `UPDATE recipes
+     SET popularity = ${updatedPopularity}
+     WHERE recipe_id = '${recipe_id}' and user_id = '${user_id}'`
+  );
+  return {recipe_id, updatedPopularity};
+}
+
+
 // function to update the recipe popularity in the likes table
 async function updateRecipePopularity(recipe_id, currentPopularity) {
-  const updatedPopularity = currentPopularity + 1;
+  const updatedPopularity = Number(currentPopularity) + 1;
   await DButils.execQuery(
     `UPDATE recipe_likes
      SET likes_count = ${updatedPopularity}
@@ -78,7 +91,9 @@ module.exports = {
   // add recipe to the likes table
   addRecipeToLikeDB,
   // update recipe popularity in the likes table
-  updateRecipePopularity
+  updateRecipePopularity,
+  // 
+  updateRecipePopularityInUserDB
 };
 
 
