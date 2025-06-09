@@ -27,14 +27,14 @@ app.use(express.urlencoded({ extended: false })); // parse application/x-www-for
 app.use(express.static(path.join(__dirname, "public"))); //To serve static files such as images, CSS files, and JavaScript files
 //local:
 app.use(express.static(path.join(__dirname, "dist")));
-//remote:
+//remote: ***Check the correct path to dist***
 // app.use(express.static(path.join(__dirname, '../assignment-3-3-frontend/dist')));
 
 
 
 app.get("/",function(req,res)
 { 
-  //remote: 
+  //remote: ***Check the correct path to index.html file in the dist folder***
   // res.sendFile(path.join(__dirname, '../assignment-3-3-frontend/dist/index.html'));
   //local:
   res.sendFile(__dirname+"/index.html");
@@ -93,7 +93,7 @@ app.use(function (err, req, res, next) {
 });
 
 
-
+// local:
 const server = app.listen(port, () => {
   console.log(`Server listen on port ${port}`);
 });
@@ -104,3 +104,6 @@ process.on("SIGINT", function () {
   }
   process.exit();
 });
+
+// remote:
+// module.exports = app; 
