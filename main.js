@@ -8,6 +8,14 @@ const DButils = require("./routes/utils/DButils");
 var cors = require('cors')
 
 var app = express();
+
+app.use(cors({
+  origin: 'http://localhost:8080',
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
+}));
+
+
 app.use(logger("dev")); //logger
 app.use(express.json()); // parse application/json
 app.use(
@@ -41,16 +49,7 @@ app.get("/",function(req,res)
 
 });
 
-// app.use(cors());
-// app.options("*", cors());
 
-// const corsConfig = {
-//   origin: true,
-//   credentials: true
-// };
-
-// app.use(cors(corsConfig));
-// app.options("*", cors(corsConfig));
 
 var port = process.env.PORT || "3000"; //local=3000 remote=80
 //#endregion
