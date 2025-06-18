@@ -64,15 +64,20 @@ CREATE TABLE IF NOT EXISTS viewed_recipes (
 );
 
 -- Table to track user searches
-CREATE TABLE IF NOT EXISTS user_searches (
+CREATE TABLE user_search_history (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
-    recipe_id VARCHAR(255) NOT NULL,
-    search_query VARCHAR(255) NOT NULL,
-    search_timestamp DATETIME NOT NULL,
+    query VARCHAR(255),
+    cuisine VARCHAR(100),
+    diet VARCHAR(100),
+    intolerance VARCHAR(100),
+    limit_results INT,
+    sort_by VARCHAR(100),
+    sort_direction VARCHAR(10),
+    recipe_ids TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
-
 
 CREATE TABLE IF NOT EXISTS recipe_likes (
     recipe_id VARCHAR(255) NOT NULL PRIMARY KEY,

@@ -28,7 +28,7 @@ router.get("/random", async (req, res, next) => {
  * This path return a recipe by id from spoonacular API
  */
 
-router.get("/:recipe_id", async (req, res, next) => {
+router.get("/:recipeid", async (req, res, next) => {
     try{
         const recipe_id = String(req.params.recipeid);
         // check if the recipe_id is from DB
@@ -41,7 +41,7 @@ router.get("/:recipe_id", async (req, res, next) => {
         }
         // the recipe_id is from spoonacular
         else{
-            const reciepe = await recipes_get_utils.getRecipeSpoonacular(int(recipe_id));
+            const reciepe = await recipes_get_utils.getRecipeSpoonacular(parseInt(recipe_id));
             if(!reciepe){
                 res.status(404).send("No such recipe with the given id");
             }
@@ -106,6 +106,39 @@ router.post("/:recipe_id/like", async (req, res, next) => {
     }
 });
 
+
+/**
+ * This path returns the number of likes for a recipe (from API or DB)
+ */
+router.get("/:recipe_id/likes", async (req, res, next) => {
+    try {
+        const recipe_id = String(req.params.recipe_id);
+        const isUserRecipe = recipe_id.includes("ID");
+
+        // ננסה להביא מהטבלה של recipe_likes
+        const recipeInLikes = await recipes_get_utils.getFromLikeDB(recipe_id);
+
+        if (recipeInLikes) {
+            res.status(200).send({ recipe_id, popularity: Number(recipeInLikes.likes_count) });
+        } else {
+            if (isUserRecipe) {
+                // אם זה מתכון משתמש ואין כניסה ב-recipe_likes – נבדוק ב-tables של מתכונים
+                const recipeFromUserDB = await recipes_get_utils.getLocalRecipe(recipe_id);
+                const popularity = recipeFromUserDB ? Number(recipeFromUserDB.popularity || 0) : 0;
+                res.status(200).send({ recipe_id, popularity });
+            } else {
+                // מתכון API – נביא מה-Spoonacular
+                const recipeFromAPI = await recipes_get_utils.getRecipeOverViewSpoonacular(recipe_id);
+                const popularity = recipeFromAPI ? recipeFromAPI.aggregateLikes : 0;
+                res.status(200).send({ recipe_id, popularity });
+            }
+        }
+
+    } catch (error) {
+        console.error("Error in getting recipe likes:", error);
+        next(error);
+    }
+});
 
 
 /** 

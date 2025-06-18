@@ -64,7 +64,8 @@ The server uses a MySQL database with the following key tables:
 * `GET /api/users/my_recipes`  
 * `POST /api/users/my_recipes` – body should contain a JSON object with all the recipe details.  
 * `POST /api/users/{recipeID}/viewed` – path parameter: `recipeID`  
-* `GET /api/users/my-last-searches`  
+* `GET /api/users/my-last-searches`
+* `POST /api/users/my-last-searches` 
 * `GET /api/users/my-last-watched`  
 * `GET /api/users/my_family`
 
@@ -83,4 +84,5 @@ The server uses a MySQL database with the following key tables:
 
 * `GET /api/recipes/{recipeID}` – path parameter: `recipeID`
 
-* `PUT /api/recipes/{recipeID}/like` – path parameter: `recipeID`
+* `POST /api/recipes/{recipeID}/like` – path parameter: `recipeID`
+* `GET /api/recipes/:recipid/likes` - path parameter: `recipid`

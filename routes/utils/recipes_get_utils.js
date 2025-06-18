@@ -201,11 +201,10 @@ async function getRecipeComplex(params) {
 
 // function to get the recipe id and popularity from the likes table
 async function getFromLikeDB(recipe_id) {
-  const result = await DButils.execQuery(
-    `SELECT recipe_id, likes_count FROM recipe_likes WHERE recipe_id = '${recipe_id}'`
-  );
-  if (result.length === 0) return null;
-  return { id: result[0].recipe_id, popularity: result[0].likes_count };
+    const result = await DButils.execQuery(
+        `SELECT likes_count FROM recipe_likes WHERE recipe_id = '${recipe_id}'`
+    );
+    return result.length ? result[0] : null;
 }
 
 // function to extract recipe details from the Spoonacular API response

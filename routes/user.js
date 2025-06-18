@@ -44,10 +44,8 @@ router.get('/my_favorites', async (req,res,next) => {
   try{
     const user_id = req.session.user_id;
     const recipes_id = await user_utils.getFavoriteRecipes(user_id); //returns the recipes id of the favorite recipes from the DB table
-    let recipes_id_array = [];
-    recipes_id.map((element) => recipes_id_array.push(element.recipe_id)); //extracting the recipe ids into string array 
-    //for each recipe id, we get the recipe details from the DB or spoonacular
-    const results = await recipes_get_utils.getRecipeDetails(recipes_id_array,user_id); 
+    // #update this function - add to text file for the changes
+    const results = await recipes_get_utils.getRecipeDetails(recipes_id,user_id);  
     res.status(200).send(results); // returning the recipes details
   } catch(error){
     console.error("error: ", error);
@@ -111,26 +109,103 @@ router.get('/my-last-watched', async (req,res,next) => {
 
 });
 
-
 /**
- * This path return the my-last-searches reciepes of the logged-in user
+ * This path returns the last search results + the query parameters used.
  */
-router.get('/my-last-searches', async (req,res,next) => {
-  try{
-    const user_id = req.session.user_id;
-    const recipe_id = await user_utils.getLastSearch(user_id); // get the recipe id and query of the last searche from the DB table
-    if (!recipe_id) {
-      return res.status(404).send({ message: "No recent searches found." });
+router.get("/my-last-searches", async (req, res, next) => {
+  try {
+    if (!req.session || !req.session.user_id) {
+      return res.status(401).send("You must be logged in.");
     }
-    const recipeIds = recipe_id.map(r => r.recipe_id);
-    const recipe_details = await recipes_get_utils.getRecipeDetails(recipeIds,user_id); // get the recipe details from the DB or spoonacular
-    res.status(200).send(recipe_details); 
-  }catch (error){
-    console.error("error: ", error);
+
+    // Get the latest search for the user
+    const sql = `
+      SELECT *
+      FROM user_search_history
+      WHERE user_id = '${req.session.user_id}'
+      ORDER BY created_at DESC
+      LIMIT 1
+    `;
+    const result = await DButils.execQuery(sql);
+
+    if (result.length === 0) {
+      return res.status(200).send([]);
+    }
+
+    const lastSearch = result[0];
+
+    // Parse recipe IDs
+    const recipeIds = lastSearch.recipe_ids
+      ? lastSearch.recipe_ids.split(",").map(id => id.trim()).filter(Boolean)
+      : [];
+
+    const recipes = await recipes_get_utils.getRecipeDetails(recipeIds, req.session.user_id);
+
+    // Return both recipes and the original search metadata
+    res.status(200).send({
+      recipes,
+      searchMeta: {
+        query: lastSearch.query || "",
+        cuisine: lastSearch.selectedCuisine || "",
+        diet: lastSearch.selectedDiet || "",
+        intolerance: lastSearch.selectedIntolerance || "",
+        limit: lastSearch.limit_results || 10,
+      }
+    });
+  } catch (error) {
     next(error);
   }
-
 });
+
+
+
+/**
+ * This path saves the last search of the logged-in user
+ */
+router.post("/my-last-searches", async (req, res, next) => {
+  try {
+    if (!req.session || !req.session.user_id) {
+      return res.status(401).send("You must be logged in.");
+    }
+
+    const {
+      query,
+      selectedCuisine,
+      selectedDiet,
+      selectedIntolerance,
+      limit_results,
+      sortBy,
+      sortDirection,
+      recipeIds,
+    } = req.body;
+
+    const recipeIdsStr = Array.isArray(recipeIds) ? recipeIds.join(",") : null;
+    const sql = `
+      INSERT INTO user_search_history 
+      (user_id, query, cuisine, diet, intolerance, limit_results, sort_by, sort_direction, recipe_ids) 
+      VALUES (
+        '${req.session.user_id}',
+        '${query}',
+        '${selectedCuisine}',
+        '${selectedDiet}',
+        '${selectedIntolerance}',
+        ${limit_results},
+        '${sortBy}',
+        '${sortDirection}',
+        '${recipeIdsStr}'
+      );
+    `;
+
+    await DButils.execQuery(sql);
+
+    res.status(201).send({ success: true, message: "Search saved" });
+
+  } catch (error) {
+    next(error);
+  }
+});
+
+
 
 /**
  * This path returns the my-family reciepes of the logged-in user
