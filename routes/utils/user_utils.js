@@ -1,9 +1,16 @@
 const DButils = require("./DButils");
 require("dotenv").config();
 
-// synchronic function to add the recipe to the favorite list of the logged-in user
-async function markAsFavorite(user_id, recipe_id){
-    await DButils.execQuery(`insert into favoriterecipes values ('${user_id}',${recipe_id})`);
+async function markAsFavorite(user_id, recipe_id) {
+  const checkQuery = `SELECT * FROM FavoriteRecipes WHERE user_id='${user_id}' AND recipe_id='${recipe_id}'`;
+  const existing = await DButils.execQuery(checkQuery);
+
+  if (existing.length > 0) {
+    return;
+  }
+
+  const insertQuery = `INSERT INTO FavoriteRecipes (user_id, recipe_id) VALUES ('${user_id}', '${recipe_id}')`;
+  await DButils.execQuery(insertQuery);
 }
 
 // synchronic function to get the favorite recipes of the logged-in user

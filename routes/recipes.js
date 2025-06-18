@@ -53,57 +53,74 @@ router.get("/:recipeid", async (req, res, next) => {
         }
     });
 
+
 /**
-* This path add like to a recipe (both from API and DB)
-*/
-
+ * This path adds a like to a recipe (both from API and DB)
+ */
 router.post("/:recipe_id/like", async (req, res, next) => {
-    try {
-        const recipe_id = String(req.params.recipe_id);
-        let recipeData;
-        let isUserRecipe = recipe_id.includes("ID");
+  try {
+    const recipe_id = String(req.params.recipe_id);
+    const user_id = req.session?.user_id;
+    const isUserRecipe = recipe_id.includes("ID");
 
-        // Check if the recipe is already in the likes table
-        const recipeInLikes = await recipes_get_utils.getFromLikeDB(recipe_id);
+    let recipeData;
+    let popularity = 0;
 
-        // if the recipe is not in the DB already
-        if (!recipeInLikes) {
-            // if the recipe is user's recipe
-            if (isUserRecipe) {
-                // if it's a user-created recipe, the user must be logged in and there is a session
-                recipeData = await recipes_get_utils.getLocalRecipeLikes(recipe_id, req.session.user_id);
-                if (!recipeData) throw new Error("Recipe not found in user DB");
-                // Add to recipe_likes and update popularity in both likes table and recipes table
-                await recipes_post_utils.addRecipeToLikeDB(recipe_id, 1);
-                await recipes_post_utils.updateRecipePopularityInUserDB(recipe_id, 1, req.session.user_id);
-                res.status(200).send({ success: true, recipe_id, popularity: 1 });
-            } else {
-                // Recipe from API - fetch overview
-                recipeData = await recipes_get_utils.getRecipeOverViewSpoonacular(recipe_id);
-                if (!recipeData) throw new Error("Recipe not found in Spoonacular API");
+    // 1. Check if the recipe is already in the likes table
+    const recipeInLikes = await recipes_get_utils.getFromLikeDB(recipe_id);
 
-                // Add to likes table
-                await recipes_post_utils.addRecipeToLikeDB(recipe_id, recipeData.popularity);
-                res.status(200).send({ success: true, recipe_id, popularity: recipeData.popularity+1 });
-            }
-        } else {
-            console.log("Recipe already liked: ", recipeInLikes, "type: " ,typeof recipeInLikes);
-            // If the recipe is already liked, increment the like count
-            recipeData = await recipes_post_utils.updateRecipePopularity(recipe_id, Number(recipeInLikes.popularity));
+    if (!recipeInLikes) {
+      // 2. If the recipe is a user-created recipe
+      if (isUserRecipe) {
+        if (!user_id) throw new Error("You must be logged in to like user-created recipes");
 
-            if (isUserRecipe) {
-                // Also update the popularity field in user-created recipe 
-                await recipes_post_utils.updateRecipePopularityInUserDB(recipe_id, Number(recipeInLikes.popularity), req.session.user_id);
-            }
-            res.status(200).send({ success: true, recipe_id, popularity: recipeData.updatedPopularity });
+        recipeData = await recipes_get_utils.getLocalRecipeLikes(recipe_id, user_id);
+        if (!recipeData) throw new Error("User recipe not found");
+
+        popularity = 1;
+
+        // Save like in like table
+        await recipes_post_utils.addRecipeToLikeDB(recipe_id, popularity);
+
+        // Update popularity in the user's recipe table
+        await recipes_post_utils.updateRecipePopularityInUserDB(recipe_id, popularity, user_id);
+
+        return res.status(200).send({ success: true, recipe_id, popularity });
+
+      } else {
+        // 3. API recipe
+        recipeData = await recipes_get_utils.getRecipeOverViewSpoonacular(recipe_id);
+        if (!recipeData || typeof recipeData.popularity !== "number") {
+          throw new Error("API recipe data invalid or popularity not found");
         }
 
-        
+        popularity = recipeData.popularity + 1;
 
-    } catch (error) {
-        console.error("Error in liking recipe:", error);
-        next(error);
+        await recipes_post_utils.addRecipeToLikeDB(recipe_id, popularity);
+
+        return res.status(200).send({ success: true, recipe_id, popularity });
+      }
     }
+
+    // 4. If already exists in likes table, increment
+    const currentPopularity = Number(recipeInLikes.likes_count);
+    if (isNaN(currentPopularity)) throw new Error("Current popularity is not a number");
+
+    const updatedPopularity = currentPopularity + 1;
+
+    // Update like count
+    await recipes_post_utils.updateRecipePopularity(recipe_id, updatedPopularity);
+
+    if (isUserRecipe && user_id) {
+      await recipes_post_utils.updateRecipePopularityInUserDB(recipe_id, updatedPopularity, user_id);
+    }
+
+    res.status(200).send({ success: true, recipe_id, popularity: updatedPopularity });
+
+  } catch (error) {
+    console.error("Error in liking recipe:", error);
+    next(error);
+  }
 });
 
 
@@ -111,35 +128,31 @@ router.post("/:recipe_id/like", async (req, res, next) => {
  * This path returns the number of likes for a recipe (from API or DB)
  */
 router.get("/:recipe_id/likes", async (req, res, next) => {
-    try {
-        const recipe_id = String(req.params.recipe_id);
-        const isUserRecipe = recipe_id.includes("ID");
+  try {
+    const recipe_id = String(req.params.recipe_id);
+    const isUserRecipe = recipe_id.includes("ID");
 
-        // ננסה להביא מהטבלה של recipe_likes
-        const recipeInLikes = await recipes_get_utils.getFromLikeDB(recipe_id);
+    const recipeInLikes = await recipes_get_utils.getFromLikeDB(recipe_id);
 
-        if (recipeInLikes) {
-            res.status(200).send({ recipe_id, popularity: Number(recipeInLikes.likes_count) });
-        } else {
-            if (isUserRecipe) {
-                // אם זה מתכון משתמש ואין כניסה ב-recipe_likes – נבדוק ב-tables של מתכונים
-                const recipeFromUserDB = await recipes_get_utils.getLocalRecipe(recipe_id);
-                const popularity = recipeFromUserDB ? Number(recipeFromUserDB.popularity || 0) : 0;
-                res.status(200).send({ recipe_id, popularity });
-            } else {
-                // מתכון API – נביא מה-Spoonacular
-                const recipeFromAPI = await recipes_get_utils.getRecipeOverViewSpoonacular(recipe_id);
-                const popularity = recipeFromAPI ? recipeFromAPI.aggregateLikes : 0;
-                res.status(200).send({ recipe_id, popularity });
-            }
-        }
-
-    } catch (error) {
-        console.error("Error in getting recipe likes:", error);
-        next(error);
+    if (recipeInLikes) {
+      res.status(200).send({ recipe_id, likes: Number(recipeInLikes.likes_count) });
+    } else {
+      if (isUserRecipe) {
+        const recipeFromUserDB = await recipes_get_utils.getLocalRecipe(recipe_id);
+        const likes = recipeFromUserDB ? Number(recipeFromUserDB.popularity || 0) : 0;
+        res.status(200).send({ recipe_id, likes });
+      } else {
+        const recipeFromAPI = await recipes_get_utils.getRecipeOverViewSpoonacular(recipe_id);
+        const likes = recipeFromAPI ? recipeFromAPI.aggregateLikes : 0;
+        res.status(200).send({ recipe_id, likes });
+      }
     }
-});
 
+  } catch (error) {
+    console.error("Error in getting recipe likes:", error);
+    next(error);
+  }
+});
 
 /** 
  * This path return a recipe from spoonacular API by criterias for searching
