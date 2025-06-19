@@ -262,4 +262,29 @@ router.get('/my_family', async (req,res,next) => {
   });
 
 
+
+/**
+ * This path returns all recipe IDs the logged-in user has viewed
+ */
+router.get("/watched", async (req, res, next) => {
+  try {
+    if (!req.session || !req.session.user_id) {
+      return res.status(401).send("You must be logged in.");
+    }
+
+    const userId = req.session.user_id;
+    const result = await DButils.execQuery(
+      `SELECT DISTINCT recipe_id FROM viewed_recipes WHERE user_id = '${userId}'`
+    );
+
+    const recipeIds = result.map(row => row.recipe_id);
+
+    res.status(200).send(recipeIds);
+  } catch (error) {
+    next(error);
+  }
+});
+
+
+
 module.exports = router;

@@ -74,7 +74,7 @@ router.post("/:recipe_id/like", async (req, res, next) => {
       if (isUserRecipe) {
         if (!user_id) throw new Error("You must be logged in to like user-created recipes");
 
-        recipeData = await recipes_get_utils.getLocalRecipeLikes(recipe_id, user_id);
+        recipeData = await recipes_get_utils.getLocalRecipes(recipe_id, user_id);
         if (!recipeData) throw new Error("User recipe not found");
 
         popularity = 1;
@@ -138,12 +138,12 @@ router.get("/:recipe_id/likes", async (req, res, next) => {
       res.status(200).send({ recipe_id, likes: Number(recipeInLikes.likes_count) });
     } else {
       if (isUserRecipe) {
-        const recipeFromUserDB = await recipes_get_utils.getLocalRecipe(recipe_id);
+        const recipeFromUserDB = await recipes_get_utils.getLocalRecipes([recipe_id]);
         const likes = recipeFromUserDB ? Number(recipeFromUserDB.popularity || 0) : 0;
         res.status(200).send({ recipe_id, likes });
       } else {
         const recipeFromAPI = await recipes_get_utils.getRecipeOverViewSpoonacular(recipe_id);
-        const likes = recipeFromAPI ? recipeFromAPI.aggregateLikes : 0;
+        const likes = recipeFromAPI ? recipeFromAPI.popularity : 0;
         res.status(200).send({ recipe_id, likes });
       }
     }
