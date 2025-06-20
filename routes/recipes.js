@@ -74,7 +74,7 @@ router.post("/:recipe_id/like", async (req, res, next) => {
       if (isUserRecipe) {
         if (!user_id) throw new Error("You must be logged in to like user-created recipes");
 
-        recipeData = await recipes_get_utils.getLocalRecipes(recipe_id, user_id);
+        recipeData = await recipes_get_utils.getLocalRecipes([recipe_id], user_id);
         if (!recipeData) throw new Error("User recipe not found");
 
         popularity = 1;
@@ -106,10 +106,8 @@ router.post("/:recipe_id/like", async (req, res, next) => {
     const currentPopularity = Number(recipeInLikes.likes_count);
     if (isNaN(currentPopularity)) throw new Error("Current popularity is not a number");
 
-    const updatedPopularity = currentPopularity + 1;
-
     // Update like count
-    await recipes_post_utils.updateRecipePopularity(recipe_id, updatedPopularity);
+    await recipes_post_utils.updateRecipePopularity(recipe_id, currentPopularity);
 
     if (isUserRecipe && user_id) {
       await recipes_post_utils.updateRecipePopularityInUserDB(recipe_id, updatedPopularity, user_id);

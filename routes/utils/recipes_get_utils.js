@@ -15,6 +15,7 @@ async function getRecipeInformation(recipe_id) {
     return await axios.get(`${api_domain}/${recipe_id}/information`, {
         params: {
             includeNutrition: false,
+            includeInstruction: true,
             apiKey: process.env.spooncular_apiKey
         }
     });
@@ -219,7 +220,7 @@ async function extractRecipeDetails(recipe) {
     vegetarian,
     glutenFree,
     servings,
-    instructions,
+    analyzedInstructions,
     extendedIngredients,
     creditsText,     
     occasions        

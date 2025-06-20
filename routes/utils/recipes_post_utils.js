@@ -2,20 +2,14 @@ const axios = require("axios");
 const api_domain = "https://api.spoonacular.com/recipes";
 const DButils = require("./DButils");
 
+async function generateCustomRecipeId() {
+  const result = await DButils.execQuery(`
+    SELECT MAX(CAST(SUBSTRING(recipe_id, 1, LENGTH(recipe_id) - 2) AS UNSIGNED)) AS max_id
+    FROM recipes
+    WHERE recipe_id REGEXP '^[0-9]+ID$';
+  `);
 
-// Get the highest existing recipe number for this user and generante a new one
-async function generateCustomRecipeId(user_id) {
-  const existing = await DButils.execQuery(
-    `SELECT recipe_id FROM recipes WHERE user_id=${user_id}`
-  );
-  let maxNum = 1000;
-  for (let recipe of existing) {
-    const match = recipe.recipe_id.match(/^(\d+)ID$/);
-    if (match) {
-      const num = parseInt(match[1]);
-      if (num > maxNum) maxNum = num;
-    }
-  }
+  const maxNum = result[0].max_id || 1000; // default start
   const nextId = `${maxNum + 1}ID`;
   return nextId;
 }
@@ -23,7 +17,7 @@ async function generateCustomRecipeId(user_id) {
 
 // create a new recipe in the DB
 async function createRecipe(user_id, recipe_details) {
-  const recipe_id = await generateCustomRecipeId(user_id);
+  const recipe_id = await generateCustomRecipeId();
   //insert recipe details into the DB
     await DButils.execQuery(`
       INSERT INTO recipes (
