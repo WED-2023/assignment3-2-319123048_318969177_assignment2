@@ -15,7 +15,6 @@ async function getRecipeInformation(recipe_id) {
     return await axios.get(`${api_domain}/${recipe_id}/information`, {
         params: {
             includeNutrition: false,
-            includeInstruction: true,
             apiKey: process.env.spooncular_apiKey
         }
     });
@@ -196,7 +195,9 @@ function getRecipesID(res_response) {
 // GET https://api.spoonacular.com/recipes/complexSearch 
 async function getRecipeComplex(params) {
     return await axios.get(`${api_domain}/complexSearch`, {
-        params
+        params,
+        instructionsRequired: true,
+        addRecipeInformation: true,
     });
 }
 
@@ -226,19 +227,16 @@ async function extractRecipeDetails(recipe) {
     occasions        
   } = recipe;
 
-  // Extract ingredients with name, amount, unit
   const ingredients = extendedIngredients.map(ingredient => ({
     name: ingredient.name,
     amount: ingredient.amount,
     unit: ingredient.unit
   }));
 
-  // Handle instructions array 
-  const instructionSteps = recipe.analyzedInstructions?.length > 0
-    ? recipe.analyzedInstructions[0].steps.map(step => step.step)
-    : instructions ? [instructions] : [];
+  const instructionSteps = analyzedInstructions?.length > 0
+    ? analyzedInstructions[0].steps.map(step => step.step)
+    : [];
 
-  // Extract occasion if exists (first one, or null)
   const occasion = occasions.length > 0 ? occasions[0] : null;
 
   return {
@@ -257,6 +255,7 @@ async function extractRecipeDetails(recipe) {
     occasion
   };
 }
+
 
 
 // function to get all the data about the recipe from Spoonacular API

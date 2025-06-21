@@ -41,8 +41,8 @@ router.get("/:recipeid", async (req, res, next) => {
         }
         // the recipe_id is from spoonacular
         else{
-            const reciepe = await recipes_get_utils.getRecipeSpoonacular(parseInt(recipe_id));
-            if(!reciepe){
+            const recipe = await recipes_get_utils.getRecipeSpoonacular(parseInt(recipe_id));
+            if(!recipe){
                 res.status(404).send("No such recipe with the given id");
             }
             res.status(200).send(recipe);
