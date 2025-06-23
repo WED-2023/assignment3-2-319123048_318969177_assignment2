@@ -1,8 +1,46 @@
-# In auth/resigster - change to response 409 for used username
-# In user schema - add the field profile_image as string
-# In auth/login - change the message of the 401 response to "Invalid username or password"
-# In User - add the option to create recipe
-# In Recipe scheme - change the id field to be a string, so recipes from DB are strings with ID at the end
-# In Recipes - (complex search) make the query param a requierd field
-# In Recipes - action get (complex search) set the limit field to not requierd 
-# In Recipes - deleting the option to patch (update) a recipe
+# changes that were made from 3.1 to 3.2:
+
+# In Authorization:
+- In /api/auth/register: updated to return status code 409 if username is already taken.
+- In /api/auth/login: changed the 401 error message to "Invalid username or password".
+
+# In Database:
+- In user schema: added new field `profile_image` as string.
+- In Recipe Schema: Changed the `id` field to be a string to support DB recipes with "ID" suffix (e.g., "1ID").
+
+# In User API:
+- Added support for creating a recipe via POST /api/users/my_recipes.
+
+# In /api/recipes (complex search):
+- Made `query` a **required** query parameter.
+- Made `limit` an **optional** parameter (default value is 5).
+
+# In /api/recipes:
+- Removed the PATCH route – updating a recipe is no longer supported.
+
+
+
+# Changes that were made from 3.2 to 3.3:
+
+# In Database:
+- Renamed table `user_searches` → `user_history_search`.
+     This table now logs the query, filters, and list of recipe IDs returned from each search.
+- In Users schema - delete the column profile_image
+
+# In /api/users/my-last-searches:
+- GET now returns both the list of recipes and the original search metadata.
+- New option added: POST, stores all search parameters and the list of recipe IDs returned from the search into the DB.
+
+# In /api/recipes/:id/similar:
+- New route added to get 5 similar recipes based on a Spoonacular recipe ID.
+
+# In /api/recipes/:recipe_id/like:
+- Added full logic to support liking both Spoonacular and user-created recipes.
+- If the recipe is already in DB, update like count; otherwise insert it with default popularity.
+
+# In /api/recipes/:recipe_id/likes:
+- New route added to get the like count for a recipe (Spoonacular or local).
+
+# In /api/users/watched:
+- New route to return all recipe IDs the log
+

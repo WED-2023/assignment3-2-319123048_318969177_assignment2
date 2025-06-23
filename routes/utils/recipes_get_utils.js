@@ -333,6 +333,34 @@ async function getLocalRecipeLikes(recipe_id,user_id) {
     return result[0].popularity;
 }
 
+// a function to get from the spoonacular API similar recipes to the recipe that I wanted
+// GET https://api.spoonacular.com/recipes/{id}/similar
+async function getSimilarRecipes(recipe_id) {
+  try {
+    const res = await axios.get(`${api_domain}/recipes/${recipe_id}/similar`, {
+      params: {
+        number: 5,
+        apiKey: process.env.spooncular_apiKey
+      }
+    });
+
+    const ids = res.data.map(recipe => recipe.id);
+    const recipes = [];
+
+    for (const id of ids) {
+      let recipe = await getRecipeSpoonacular(id);
+      recipes.push(recipe);
+    }
+
+    if (!recipes || recipes.length === 0) return null;
+    return recipes;
+  } catch (error) {
+    console.error("Failed to fetch similar recipes:", error);
+    return null;
+  }
+}
+
+
 module.exports = {
     // for multiple recipes from DB 
     getLocalRecipes,
@@ -357,6 +385,8 @@ module.exports = {
     // get all details abput a recipe from DB
     getRecipeFromDB,
     // get from DB likes of a DB recipe
-    getLocalRecipeLikes
+    getLocalRecipeLikes,
+    // get similiar recipes from spoonacular
+    getSimilarRecipes
     
 }

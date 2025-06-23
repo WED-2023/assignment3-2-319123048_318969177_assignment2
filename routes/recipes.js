@@ -193,4 +193,29 @@ router.get("",async (req, res, next) => {
             next(error);
         }
     });
+
+
+/**
+*  This path retures 5 similar recipes to the given recipe id
+*  GET https://api.spoonacular.com/recipes/{id}/similar
+*/
+router.get("/:id/similar",async (req, res, next) => {
+    try{
+        const recipe_id = String(req.params.id);
+        if (!recipe_id) {
+            return res.status(400).send("Recipe ID is required");
+        }
+
+        const similarRecipes = await recipes_get_utils.getSimilarRecipes(recipe_id);
+        if (!similarRecipes || similarRecipes.length === 0) {
+            return res.status(404).send("No similar recipes found");
+        }
+
+        res.status(200).send(similarRecipes);
+    } catch (error) {
+        console.error("Error in getting similar recipes:", error);
+        next(error);
+    } 
+    });
+
 module.exports = router;

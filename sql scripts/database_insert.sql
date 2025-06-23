@@ -2,8 +2,6 @@
 -- To users table use PostMan with url /auth/register
 
 
-
-
 INSERT INTO recipes (
     recipe_id, user_id, title, ready_in_minutes, image, popularity,
     vegan, vegetarian, gluten_free, instructions, servings,
@@ -48,14 +46,6 @@ VALUES
 (3, '716429'),
 (1, '716429'),
 (2, '715538');
-
-
-INSERT INTO user_searches (user_id, recipe_id, search_query, search_timestamp)
-VALUES
-(2, '1ID', 'vegan pasta', NOW()),
-(1, '2ID', 'cookies', NOW() - INTERVAL 1 DAY),
-(2, '3ID', 'shakshuka', NOW() - INTERVAL 2 DAY),
-(3, '4ID', 'chocolate brownies', NOW() - INTERVAL 3 DAY);
 
 
 INSERT INTO recipe_likes (recipe_id, likes_count) VALUES

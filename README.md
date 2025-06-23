@@ -39,7 +39,7 @@ The server uses a MySQL database with the following key tables:
 | `ingredients`      | Lists ingredients for each recipe, linked by `recipe_id`. |
 | `FavoriteRecipes`  | Tracks which recipes (user-created or Spoonacular) a user has marked as favorites. |
 | `viewed_recipes`   | Records which recipes (user-created or Spoonacular) each user has viewed, including timestamps. |
-| `user_searches`    | Logs each search made by a user, including query and selected recipe. |
+| `user_search_history` | Logs each search made by a user, including query, filters, sorting options, and recipe IDs returned in the results. |
 | `recipe_likes`     | Tracks the number of likes per recipe (both user and Spoonacular). |
 
 ---
@@ -87,3 +87,4 @@ The server uses a MySQL database with the following key tables:
 
 * `POST /api/recipes/{recipeID}/like` – path parameter: `recipeID`
 * `GET /api/recipes/:recipid/likes` - path parameter: `recipid`
+* `GET /api/recipes/:id/similar` - path parameter `id` 
