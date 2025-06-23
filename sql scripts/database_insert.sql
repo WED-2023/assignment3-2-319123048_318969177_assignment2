@@ -1,4 +1,4 @@
-
+USE mydb
 -- To users table use PostMan with url /auth/register
 
 

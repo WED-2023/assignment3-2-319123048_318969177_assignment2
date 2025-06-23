@@ -1,3 +1,6 @@
+CREATE DATABASE mydb 
+    DEFAULT CHARACTER SET = 'utf8mb4';
+
 USE mydb;
 -- Users table
 CREATE TABLE IF NOT EXISTS users (

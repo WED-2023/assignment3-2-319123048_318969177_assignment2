@@ -10,7 +10,8 @@ var cors = require('cors')
 var app = express();
 
 app.use(cors({
-  origin: 'http://localhost:8080',
+  //origin: 'http://localhost:8080',
+  origin: 'https://noa-yaki.cs.bgu.ac.il',
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
 }));
@@ -34,24 +35,24 @@ app.use(
 app.use(express.urlencoded({ extended: false })); // parse application/x-www-form-urlencoded
 app.use(express.static(path.join(__dirname, "public"))); //To serve static files such as images, CSS files, and JavaScript files
 //local:
-app.use(express.static(path.join(__dirname, "dist")));
+//app.use(express.static(path.join(__dirname, "dist")));
 //remote: ***Check the correct path to dist***
-// app.use(express.static(path.join(__dirname, '../assignment-3-3-frontend/dist')));
+app.use(express.static(path.join(__dirname, '../assignment3-3-319123048_318969177_assignment2/dist')));
 
 
 
 app.get("/",function(req,res)
 { 
   //remote: ***Check the correct path to index.html file in the dist folder***
-  // res.sendFile(path.join(__dirname, '../assignment-3-3-frontend/dist/index.html'));
+  res.sendFile(path.join(__dirname, '../assignment3-3-319123048_318969177_assignment2/dist/index.html'));
   //local:
-  res.sendFile(__dirname+"/index.html");
+  //res.sendFile(__dirname+"/index.html");
 
 });
 
 
 
-var port = process.env.PORT || "3000"; //local=3000 remote=80
+//var port = process.env.PORT || "80"; //local=3000 remote=80
 //#endregion
 const user = require("./routes/user");
 const recipes = require("./routes/recipes");
@@ -93,16 +94,16 @@ app.use(function (err, req, res, next) {
 
 
 // local:
-const server = app.listen(port, () => {
-  console.log(`Server listen on port ${port}`);
-});
+// const server = app.listen(port, () => {
+//   console.log(`Server listen on port ${port}`);
+// });
 
-process.on("SIGINT", function () {
-  if (server) {
-    server.close(() => console.log("server closed"));
-  }
-  process.exit();
-});
+// process.on("SIGINT", function () {
+//   if (server) {
+//     server.close(() => console.log("server closed"));
+//   }
+//   process.exit();
+// });
 
 // remote:
-// module.exports = app; 
+module.exports = app; 
