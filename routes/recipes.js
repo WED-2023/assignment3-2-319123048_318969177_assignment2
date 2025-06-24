@@ -94,10 +94,10 @@ router.post("/:recipe_id/like", async (req, res, next) => {
           throw new Error("API recipe data invalid or popularity not found");
         }
 
-        popularity = recipeData.popularity + 1;
+        popularity = recipeData.popularity;
 
         await recipes_post_utils.addRecipeToLikeDB(recipe_id, popularity);
-
+        popularity = popularity + 1
         return res.status(200).send({ success: true, recipe_id, popularity });
       }
     }
@@ -110,10 +110,10 @@ router.post("/:recipe_id/like", async (req, res, next) => {
     await recipes_post_utils.updateRecipePopularity(recipe_id, currentPopularity);
 
     if (isUserRecipe && user_id) {
-      await recipes_post_utils.updateRecipePopularityInUserDB(recipe_id, updatedPopularity, user_id);
+      await recipes_post_utils.updateRecipePopularityInUserDB(recipe_id, currentPopularity, user_id);
     }
 
-    res.status(200).send({ success: true, recipe_id, popularity: updatedPopularity });
+    res.status(200).send({ success: true, recipe_id, popularity: currentPopularity + 1 });
 
   } catch (error) {
     console.error("Error in liking recipe:", error);
