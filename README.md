@@ -88,3 +88,31 @@ The server uses a MySQL database with the following key tables:
 * `POST /api/recipes/{recipeID}/like` – path parameter: `recipeID`
 * `GET /api/recipes/:recipid/likes` - path parameter: `recipid`
 * `GET /api/recipes/:id/similar` - path parameter `id` 
+
+
+
+## 📦 Project directories structure
+```
+.
+├── routes/                           # Entry points for API endpoints
+│   ├── auth.js                       # Authentication: register, login, logout
+│   ├── users.js                      # User actions: favorites, viewed, history
+│   ├── recipes.js                    # Logic for recipe search & access
+│   │
+│   ├── utils/
+│   │   ├── recipes_get_utils.js      # Handles fetching recipes
+│   │   ├── recipes_post_utils.js     # Handles changings in DB recipes
+│   │   └── users_utils.js            # Logic for user-related actions
+│   │   └── DButils.js               
+│   │   └── MySql.js                  # Connection to MySql DB
+│
+├── sql_scripts/                      # Create DB tables and insert data
+├── dist/                             # Connection to Swagger API 
+│
+├── .env                              # Server credentials, DB connection and Spoonacular key
+├── API_changes.txt                   # Manual log of OpenAPI spec changes from 3.1
+├── JSON_example.txt                  # JSON examples for testing via Postman
+├── package.json                      # Project metadata & dependencies
+├── main.js                           # Main Express app entry point
+└── server_connection.js              # Server in remote mode
+```
